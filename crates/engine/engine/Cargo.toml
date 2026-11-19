@@ -52,7 +52,10 @@ objc2-avf-audio = { version = "0.3.2", default-features = false, features = ["st
 objc2-core-media = { version = "0.3.2", default-features = false, features = ["std", "CMBase", "CMTime", "CMSampleBuffer", "CMBlockBuffer", "CMFormatDescription", "objc2-core-audio-types"] }
 objc2-core-video = { version = "0.3.2", default-features = false, features = ["std", "CVBase", "CVBuffer", "CVImageBuffer", "CVPixelBuffer", "CVPixelBufferPool", "CVReturn"] }
 objc2-core-audio-types = { version = "0.3.2", default-features = false, features = ["std", "CoreAudioBaseTypes"] }
-objc2-core-foundation = { version = "0.3.2", default-features = false, features = ["std", "CFString"] }
+objc2-core-foundation = { version = "0.3.2", default-features = false, features = ["std", "CFString", "CFRunLoop", "CFDate"] }
+# Gamepads (`controller.rs`): the system's GameController framework, which talks to the Switch, Xbox
+# and PlayStation pads as they want (a Switch Pro over Bluetooth sends gilrs nothing).
+objc2-game-controller = { version = "0.3.2", default-features = false, features = ["std", "GCController", "GCDevice", "GCExtendedGamepad", "GCPhysicalInputProfile", "GCControllerElement", "GCControllerButtonInput", "GCControllerAxisInput", "GCControllerDirectionPad"] }
 
 # The local hour of the day (`clock.rs`): the C library's `localtime_r`, which knows the time zone.
 [target.'cfg(unix)'.dependencies]

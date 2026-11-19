@@ -985,7 +985,7 @@ pub fn list_live(seconds: f64) {
             }
         }
         list.iter_mut().for_each(Controller::end_frame);
-        std::thread::sleep(std::time::Duration::from_millis(50));
+        port.wait(0.05);
     }
     if names.is_empty() {
         println!("No controller connected.");

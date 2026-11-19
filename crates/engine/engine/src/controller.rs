@@ -8,6 +8,10 @@
 
 use gilrs::{EventType, Gilrs, GilrsBuilder, MappingSource};
 
+#[cfg(target_os = "macos")]
+#[path = "controller_macos.rs"]
+mod macos;
+
 pub use gilrs::{Axis as PadAxis, Button as PadButton};
 
 const AXIS_NAMES: [PadAxis; 8] =
@@ -224,9 +228,13 @@ fn button_index(code: u32) -> u32 {
     }
 }
 
-/// Reads the controllers of the machine. Devices can come and go at any time.
+/// Reads the controllers of the machine. Devices can come and go at any time. On macOS the gamepads come
+/// from the system's GameController framework (`controller_macos.rs`) and the rest from gilrs; while
+/// it has a gamepad, gilrs's gamepads are left out, as they are the same ones (or send nothing).
 pub struct ControllerPort {
     gilrs: Option<Gilrs>,
+    #[cfg(target_os = "macos")]
+    pads: macos::Pads,
 }
 
 impl Default for ControllerPort {
@@ -249,12 +257,38 @@ impl ControllerPort {
                 None
             }
         };
-        ControllerPort { gilrs }
+        ControllerPort { gilrs, #[cfg(target_os = "macos")]
+            pads: macos::Pads::new() }
     }
 
     /// Brings `list` up to date: new devices are added, gone ones removed, axes and buttons moved.
     /// `pressed` flags accumulate until `Controller::end_frame`.
     pub fn poll(&mut self, list: &mut Vec<Controller>) {
+        self.poll_gilrs(list);
+        #[cfg(target_os = "macos")]
+        if self.pads.poll(list) {
+            list.retain(|c| c.id >= macos::FIRST_ID || !c.standard);
+        }
+    }
+
+    /// Waits `seconds`, letting the system deliver what the devices send meanwhile (on macOS the
+    /// main thread's run loop runs: without a window's, as in `--controllers`, nothing else would).
+    pub fn wait(&self, seconds: f64) {
+        #[cfg(target_os = "macos")]
+        objc2_core_foundation::CFRunLoop::run_in_mode(unsafe { objc2_core_foundation::kCFRunLoopDefaultMode }, seconds, false);
+        #[cfg(not(target_os = "macos"))]
+        std::thread::sleep(std::time::Duration::from_secs_f64(seconds));
+    }
+
+    /// Whether the controller of this id is one of gilrs's.
+    fn from_gilrs(id: usize) -> bool {
+        #[cfg(target_os = "macos")]
+        return id < macos::FIRST_ID;
+        #[cfg(not(target_os = "macos"))]
+        return { let _ = id; true };
+    }
+
+    fn poll_gilrs(&mut self, list: &mut Vec<Controller>) {
         let Some(gilrs) = &mut self.gilrs else { return };
         while let Some(event) = gilrs.next_event() {
             let id = usize::from(event.id);
@@ -282,7 +316,7 @@ impl ControllerPort {
             }
         }
         // Devices that were there before the port was opened send no event.
-        list.retain(|c| gilrs.gamepads().any(|(id, _)| usize::from(id) == c.id));
+        list.retain(|c| !Self::from_gilrs(c.id) || gilrs.gamepads().any(|(id, _)| usize::from(id) == c.id));
         for (id, pad) in gilrs.gamepads() {
             if !list.iter().any(|c| c.id == usize::from(id)) {
                 list.push(Controller::new(usize::from(id), pad.name(), pad.mapping_source() == MappingSource::SdlMappings));
