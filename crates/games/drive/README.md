@@ -95,8 +95,9 @@ section of `kind = wheel` with its own axes: the front wheels turn as it is turn
 cut with speed or smoothed (force feedback is to come). A stick's or a pad's steering is
 shaped: a dead zone, then a strong expo (fine in the middle of the travel, full lock at its end),
 the lock cut with speed as the keyboard's (about half at 100 km/h), and the wheels follow the stick
-over 0.08 s. A gamepad's thumbstick, flicked from end to end, is cut harder (half the lock at
-72 km/h, a third at 100) and followed more slowly: out over half a second, back faster. With the automatic, the car stopped, the brake held (the stick back, or `↓`) puts it in
+over 0.08 s. A gamepad's thumbstick, flicked from end to end, reaches at its end only as far as the tyres grip at
+that speed (`Driving::pad_reach`: full lock at a walk, some 6° at 80 km/h), so a flick turns the car as
+hard as it can and not past it into a slide. With the automatic, the car stopped, the brake held (the stick back, or `↓`) puts it in
 reverse after 0.3 s; backing, back is the throttle and forward the brake, and forward held, stopped,
 puts it back in first.
 

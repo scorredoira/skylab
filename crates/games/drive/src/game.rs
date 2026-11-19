@@ -857,6 +857,7 @@ impl Game for Drive {
             self.replaying(dt);
         } else if self.driver.is_none() && self.menu.is_none() {
             if let Some(car) = self.world.vehicle_mut(self.id).car_mut() {
+                self.driving.car(car.p.wheelbase(), car.p.steering.lock_deg.to_radians());
                 let (controls, asked) = self.driving.update(input, dt, speed, car.gear(), &Feet::of(car), &car.controls);
                 car.controls = controls;
                 if asked.camera {
