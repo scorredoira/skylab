@@ -205,8 +205,88 @@ fn main() {
         None => {
             // A start the player sees: at the hour of the computer's clock, if the settings say so.
             let options = Options { clock: engine::clock::local_hour(), ..options };
-            engine::run("Skylab", 1440, 900, |gpu| Flight::new(gpu, &options, settings::Store::user(), audio::Audio::start()))
+            // The driving game is inside this program: "Cars" shows it in this window, and its
+            // "Change vehicle" brings this game back (`Shown`).
+            engine::program::host(&[ui::menu::vehicles::DRIVE, SKYLAB]);
+            engine::run("Skylab", 1440, 900, |gpu| Shown::Flight(Box::new(Flight::new(gpu, &options, settings::Store::user(), audio::Audio::start()))))
         }
+    }
+}
+
+/// This program's name, as the driving game hands back to it.
+#[cfg(not(target_arch = "wasm32"))]
+const SKYLAB: &str = "skylab";
+
+/// What Skylab's window shows: the flight game, or the driving game in its place. A hand-over
+/// (`engine::program::hand_over`) between the two is made here, after the frame's `update`: the
+/// game handed over to is made then, and the one it replaces dropped, its sound with it.
+#[cfg(not(target_arch = "wasm32"))]
+enum Shown {
+    Flight(Box<Flight>),
+    Drive(Box<drive::game::Drive>),
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+impl Shown {
+    /// The game a hand-over names, made: the driving game, or this one with the arguments given
+    /// (`--menu vehicles`: its first screen), at the hour of the computer's clock.
+    fn make(name: &str, arguments: Vec<String>, gpu: &engine::Gpu) -> Shown {
+        if name == ui::menu::vehicles::DRIVE {
+            return Shown::Drive(Box::new(drive::start(gpu)));
+        }
+        let options = parse(arguments.into_iter(), true).map(|c| c.options).unwrap_or_default();
+        let options = Options { clock: engine::clock::local_hour(), ..options };
+        Shown::Flight(Box::new(Flight::new(gpu, &options, settings::Store::user(), audio::Audio::start())))
+    }
+}
+
+/// Each of the game's calls passed to the game shown.
+#[cfg(not(target_arch = "wasm32"))]
+macro_rules! shown {
+    ($self:expr, $game:ident => $call:expr) => {
+        match $self {
+            Shown::Flight($game) => $call,
+            Shown::Drive($game) => $call,
+        }
+    };
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+impl engine::Game for Shown {
+    fn update(&mut self, input: &engine::Input, dt: f64, gpu: &engine::Gpu) {
+        shown!(self, g => g.update(input, dt, gpu));
+        if let Some((name, arguments)) = engine::program::take_switch() {
+            *self = Shown::make(&name, arguments, gpu);
+            // Its first frame is drawn now: updated first, as every frame.
+            shown!(self, g => g.update(input, dt, gpu));
+        }
+    }
+    fn ui(&mut self, ctx: &engine::egui::Context) {
+        shown!(self, g => g.ui(ctx))
+    }
+    fn draw(&mut self, gpu: &engine::Gpu, pass: &mut engine::wgpu::RenderPass<'_>) {
+        shown!(self, g => g.draw(gpu, pass))
+    }
+    fn translucent(&self) -> bool {
+        shown!(self, g => g.translucent())
+    }
+    fn before_translucent(&mut self, gpu: &engine::Gpu, encoder: &mut engine::wgpu::CommandEncoder) {
+        shown!(self, g => g.before_translucent(gpu, encoder))
+    }
+    fn draw_translucent(&mut self, gpu: &engine::Gpu, pass: &mut engine::wgpu::RenderPass<'_>) {
+        shown!(self, g => g.draw_translucent(gpu, pass))
+    }
+    fn reads_scene(&self) -> bool {
+        shown!(self, g => g.reads_scene())
+    }
+    fn samples(&self) -> u32 {
+        shown!(self, g => g.samples())
+    }
+    fn post(&self) -> engine::Post {
+        shown!(self, g => g.post())
+    }
+    fn clip_name(&self) -> Option<&str> {
+        shown!(self, g => g.clip_name())
     }
 }
 

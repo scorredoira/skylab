@@ -631,7 +631,7 @@ impl Drive {
 
     /// Shows the pause menu: the game waits. "Change vehicle" is offered if Skylab is beside this program.
     fn open_menu(&mut self) {
-        self.menu = Some(crate::pause::Menu::new(engine::program::beside(crate::pause::SKYLAB).is_some()));
+        self.menu = Some(crate::pause::Menu::new(engine::program::available(crate::pause::SKYLAB)));
         self.paused = true;
     }
 
@@ -645,9 +645,10 @@ impl Drive {
             }
             // Skylab takes this game's place, on its first screen; if it cannot, the menu says why.
             Some(Choice::Vehicles) => {
-                let error = engine::program::hand_over(crate::pause::SKYLAB, &crate::pause::FIRST_SCREEN);
-                if let Some(menu) = &mut self.menu {
-                    menu.error = Some(error);
+                if let Err(error) = engine::program::hand_over(crate::pause::SKYLAB, &crate::pause::FIRST_SCREEN) {
+                    if let Some(menu) = &mut self.menu {
+                        menu.error = Some(error);
+                    }
                 }
             }
             Some(Choice::Quit) => std::process::exit(0),

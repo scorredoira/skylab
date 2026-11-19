@@ -4,7 +4,12 @@ edition.workspace = true
 license.workspace = true
 version.workspace = true
 
-# The driving game: `target/release/skylab-drive`.
+# The driving game: a library (`src/lib.rs`, which Skylab's program also runs, in its window) and
+# its own program, `target/release/skylab-drive`.
+[lib]
+name = "drive"
+path = "src/lib.rs"
+
 [[bin]]
 name = "skylab-drive"
 path = "src/main.rs"

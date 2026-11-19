@@ -626,12 +626,11 @@ taken in the game, with a name, what there is of it and a line: **Planes**, **Dr
   flies its craft flown last (the settings keep one for each: `plane`, `drone`; the first of the
   family before any was) and shows its aircraft to choose from, over the start and pause screen
   (`Session::choose_family`). From then on the aircraft shown are those of the family flown.
-- The cars are the driving game, another program: `skylab-drive`, the file beside this game's own
-  (`engine::program::beside`: where `cargo build` puts both, and `Contents/MacOS` of the macOS
-  bundle). "Cars" starts it and ends this game (`engine::program::hand_over`); its pause menu's
-  "Change vehicle" starts this game again with `--menu vehicles`, on the first screen. If the
-  program is not there (only this game was built) the card says so. The web has no other program:
-  there the screen shows the planes and the drones.
+- The cars are the driving game (`crates/games/drive`), which this program has inside it: "Cars"
+  shows it in this window in place of this game (`engine::program::hand_over`, made by `Shown` in
+  `main.rs`: the flight game is dropped, its sound with it), and its pause menu's "Change vehicle"
+  brings this game back, made again with `--menu vehicles`, on the first screen. The web has no
+  driving game: there the screen shows the planes and the drones.
 - Esc (or "Start screen" at its top right) chooses nothing: the start and pause screen, with the
   craft that waits.
 

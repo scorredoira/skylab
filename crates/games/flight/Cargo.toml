@@ -35,3 +35,5 @@ wasm-bindgen-futures = "0.4.80"
 image = { version = "0.25.10", default-features = false, features = ["png"] }
 # The game flown by another program (`--remote`, `remote.rs`): the socket and its messages.
 remote = { path = "../remote" }
+# The driving game, shown in Skylab's window when "Cars" is chosen (`main.rs`, `Shown`).
+drive = { path = "../drive" }

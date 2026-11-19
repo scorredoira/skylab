@@ -1,7 +1,7 @@
 #!/bin/bash
-# Builds the games (release) and wraps them in target/release/Skylab.app: Skylab's binary, the
-# driving game's beside it (the first screen's "Cars" starts it, and its pause menu's "Change
-# vehicle" comes back), the icon (assets/brand/skylab.icns) and an Info.plist. Open it from Finder
+# Builds the games (release) and wraps them in target/release/Skylab.app: Skylab's binary (which
+# has the driving game inside it: the first screen's "Cars" shows it in the same window), the
+# driving game's own binary beside it, the icon (assets/brand/skylab.icns) and an Info.plist. Open it from Finder
 # or with `open target/release/Skylab.app`.
 # The app finds the repository's `assets` by walking up from its binaries, so it stays where it is made;
 # settings and downloads are the same as the binaries' (~/.config/flight, ~/.config/skylab-drive,

@@ -824,6 +824,7 @@ name = "flight"
 version = "0.1.0"
 dependencies = [
  "bytemuck",
+ "drive",
  "earcutr",
  "engine",
  "geodata",

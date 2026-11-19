@@ -1,8 +1,8 @@
 //! The first screen, as the game opens: what to drive. Three pictures that fill the window, each
 //! taken in the game (`scripts/menu-shots.sh`): the planes and the drones, which are this game's
 //! (the aircraft to choose from are then those of the family, `hangar`), and the cars, which are
-//! the driving game's: the program beside this one, started in its place (`engine::program`). On
-//! the web there is no other program, and no cars. A click on a picture chooses it; the arrows and
+//! the driving game's, which this program has inside it and shows in its window in this game's
+//! place (`engine::program::hand_over`, `Shown` in `main.rs`). On the web there are no cars. A click on a picture chooses it; the arrows and
 //! Enter, or a pad, do the same. The start and pause screen opens it again ("Change vehicle").
 
 use super::theme::{self, icon};

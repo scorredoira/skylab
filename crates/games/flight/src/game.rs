@@ -3738,7 +3738,7 @@ impl Game for Flight {
                 Some(Choice::Fly(family)) => session.choose_family(family),
                 // The driving game takes this one's place; if it cannot, the screen says why.
                 #[cfg(not(target_arch = "wasm32"))]
-                Some(Choice::Cars) => vehicles.error = Some(engine::program::hand_over(menu::vehicles::DRIVE, &[])),
+                Some(Choice::Cars) => vehicles.error = engine::program::hand_over(menu::vehicles::DRIVE, &[]).err(),
                 #[cfg(target_arch = "wasm32")]
                 Some(Choice::Cars) => {}
                 Some(Choice::Close) => session.back(),

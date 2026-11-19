@@ -8,8 +8,8 @@ start; dry or in the rain; shown again in the replay. It is the second game on `
 is in it.
 
 Run it with `scripts/drive.sh [options]` (a release build, killed if it passes 4 GB). It is also
-the "Cars" of Skylab's first screen, which starts this program in its place; the pause menu's
-"Change vehicle" goes back there ("The pause menu").
+the "Cars" of Skylab's first screen: Skylab's program has this game inside it (`src/lib.rs`) and
+shows it in its own window; the pause menu's "Change vehicle" goes back there ("The pause menu").
 
 ```text
 skylab-drive [--circuit <name>] [--car <name>] [--paint <colour>] [--hour <h>] [--view <chase|bonnet|cockpit|trackside>]
@@ -74,10 +74,10 @@ player of `src/feel.rs` then laps in 122 s; with the keys all or nothing it spin
 
 `Esc` (a pad's Start) stops the game and shows three rows: **Drive on**, **Change vehicle** and
 **Quit**. The arrows and Enter work it, a pad's direction pad or left stick and A, or the mouse;
-`Esc` or B drives on. "Change vehicle" starts Skylab, the flight simulator, on its first screen
-(planes, drones or cars) and ends this game: Skylab is the program `skylab` beside this one
-(`engine::program`: where `cargo build` puts both, and in the macOS bundle), started with
-`--menu vehicles`. The row is there only if that program is. In the replay `Esc` goes back to the
+`Esc` or B drives on. "Change vehicle" goes to Skylab, the flight simulator, on its first screen
+(planes, drones or cars), with `--menu vehicles` (`engine::program::hand_over`): in Skylab's
+window, the flight game in this one's place; run on its own (`skylab-drive`), the program `skylab`
+beside this one is started and this one ends. The row is there only if Skylab is. In the replay `Esc` goes back to the
 session, as before.
 
 ## Controllers (`src/controls.rs`)

@@ -1,27 +1,11 @@
 //! Skylab Drive, the driving game: the command line, then either the window or one frame written
 //! to a PNG (`--shot`).
 
-mod audio;
-mod camera;
-mod controls;
-mod effects;
-#[cfg(test)]
-mod feel;
-mod game;
-mod ghost;
-mod guide;
-mod hud;
-mod look;
-mod pause;
-mod race;
-mod replay;
-mod rivals;
-mod timing;
-
 use std::time::{Duration, Instant};
 
-use camera::View;
-use game::{Drive, Options};
+use drive::camera::View;
+use drive::game::{Drive, Options};
+use drive::{audio, game, guide, look, rivals};
 use world_render::Preset;
 
 const USAGE: &str = "\
@@ -73,8 +57,8 @@ skylab-drive [--circuit <name>] [--car <name>] [--hour <h>] [--view <chase|bonne
                     --replay <s> shows the replay (F2) stopped s seconds before the end
 
 Keys in the game: H shows them. Esc is the pause menu: its \"Change vehicle\" starts Skylab, the
-program beside this one, on its first screen (planes, drones or cars), as Skylab's \"Cars\" starts
-this game.";
+program beside this one, on its first screen (planes, drones or cars). Skylab's \"Cars\" shows
+this game in its own window.";
 
 fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
