@@ -462,15 +462,22 @@ impl Driving {
     /// their lock, half of it 16 %), the lock it reaches is cut with speed as the
     /// keyboard's (at 100 km/h about half, as a driver turns the wheel less the faster he goes),
     /// and it follows the stick over `STICK_LAG` seconds, as a wheel turned by hands, not a switch.
+    /// A gamepad's thumbstick, shorter still and flicked, is cut harder with speed (`PAD_SPEED`) and
+    /// followed more slowly (`PAD_LAG`, `PAD_OUT`, `PAD_BACK`).
     /// A steering wheel (`Kind::Wheel`) turns the front wheels as it is turned.
     fn stick_steer(&mut self, v: f64, dt: f64, speed: f64, kind: Kind) -> f64 {
         if kind == Kind::Wheel {
             return v.clamp(-1.0, 1.0);
         }
-        let expo = if kind == Kind::Gamepad { 0.75 } else { 0.85 };
-        let reach = 1.0 / (1.0 + (speed / STICK_SPEED).powi(2));
+        let pad = kind == Kind::Gamepad;
+        let expo = if pad { 0.75 } else { 0.85 };
+        let reach = 1.0 / (1.0 + (speed / if pad { PAD_SPEED } else { STICK_SPEED }).powi(2));
         let wanted = shape(v, 0.05, expo) * reach;
-        self.stick += (wanted - self.stick) * (dt / STICK_LAG).min(1.0);
+        let step = (wanted - self.stick) * (dt / if pad { PAD_LAG } else { STICK_LAG }).min(1.0);
+        // A thumbstick goes from end to end in a flick: the wheels turn no faster than hands would
+        // turn them, and come back towards the middle faster than they go out.
+        let rate = if pad { if wanted.abs() < self.stick.abs() || wanted.signum() != self.stick.signum() { PAD_BACK } else { PAD_OUT } } else { f64::INFINITY };
+        self.stick += step.clamp(-rate * dt, rate * dt);
         self.stick
     }
 
@@ -492,6 +499,13 @@ const OVER_HOLD: f64 = 0.3;
 const STICK_SPEED: f64 = 27.0;
 /// How long (s) the steering takes to follow a stick, as an exponential lag.
 const STICK_LAG: f64 = 0.08;
+/// A gamepad's thumbstick: its full travel turns the wheels half their lock at this speed (m/s, 72 km/h),
+const PAD_SPEED: f64 = 20.0;
+/// the steering follows it over this lag (s),
+const PAD_LAG: f64 = 0.18;
+/// and turns out at most this much of the lock a second, and back towards the middle this much.
+const PAD_OUT: f64 = 1.8;
+const PAD_BACK: f64 = 3.5;
 
 /// A stick's travel shaped: a dead zone in the middle, then an expo curve (`expo` 0 linear).
 pub fn shape(v: f64, dead: f64, expo: f64) -> f64 {
@@ -533,6 +547,17 @@ mod tests {
         assert!(soon > 0.3 && soon < 0.8, "it follows the stick, not at once: {soon}");
         let mut d = Driving::new();
         assert_eq!(d.stick_steer(0.5, 1.0 / 60.0, 100.0 / 3.6, Kind::Wheel), 0.5, "a steering wheel as it is turned");
+        // A gamepad's thumbstick, flicked to its end: the wheels go out over half a second, and
+        // less the faster.
+        let pad = |v: f64, speed: f64, seconds: f64| {
+            let mut d = Driving::new();
+            (0..(seconds * 60.0) as usize).fold(0.0, |_, _| d.stick_steer(v, 1.0 / 60.0, speed, Kind::Gamepad))
+        };
+        let flick = pad(1.0, 0.0, 0.1);
+        assert!(flick > 0.05 && flick < 0.25, "not at once: {flick}");
+        assert!((pad(1.0, 0.0, 1.5) - 1.0).abs() < 1e-2);
+        let fast = pad(1.0, 100.0 / 3.6, 1.5);
+        assert!(fast > 0.25 && fast < 0.4, "{fast}");
         let wheel = Mapping::parse(&["kind = wheel", "steer = axis2"], false);
         assert_eq!(wheel.kind, Kind::Wheel);
         assert!(wheel.text("W").contains("kind = wheel"));
