@@ -1,0 +1,37 @@
+// What moves of exterior.glb and how, its lights, its shadow: `crates/games/flight/src/models.rs`
+// says what each field is. Body axes (x forward, y right, z down), metres, radians.
+(
+    parts: [
+        (node: "fuselage", inside: Hidden),
+        (node: "cowling", shades_cabin: true),
+        (node: "airframe", shades_cabin: true),
+        (node: "aileron_left", moves: Surface(by: AileronLeft, scale: 1.0), axis: (0.06887713, 0.9976251, -0.0)),
+        (node: "aileron_right", moves: Surface(by: AileronRight, scale: -1.0), axis: (-0.06887713, 0.9976251, 0.0)),
+        (node: "elevator", moves: Surface(by: Elevator, scale: 1.0), axis: (0.0, 1.0, 0.0)),
+        (node: "rudder", moves: Surface(by: Rudder, scale: -1.0), axis: (0.0, 0.0, 1.0)),
+        (node: "strut_tail", moves: Strut(leg: 0), axis: (-0.34000015, 0.0, 0.12099998)),
+        (node: "fork_tail", moves: Fork(leg: 0), axis: (0.0, 0.0, 1.0)),
+        (node: "wheel_tail", moves: Wheel(leg: 0)),
+        (node: "strut_left", moves: Strut(leg: 1), axis: (-0.06999999, -0.52, 0.61999995)),
+        (node: "fork_left", moves: Fork(leg: 1), axis: (0.0, 0.0, 1.0)),
+        (node: "wheel_left", moves: Wheel(leg: 1)),
+        (node: "strut_right", moves: Strut(leg: 2), axis: (-0.06999999, 0.52, 0.61999995)),
+        (node: "fork_right", moves: Fork(leg: 2), axis: (0.0, 0.0, 1.0)),
+        (node: "wheel_right", moves: Wheel(leg: 2)),
+        (node: "propeller", moves: Propeller, axis: (1.0, 0.0, 0.0)),
+        (node: "propeller_disc", moves: Disc, inside: Hidden),
+    ],
+    lights: [
+        (node: "light_left", kind: Navigation, color: (8.0, 0.3, 0.2)),
+        (node: "light_right", kind: Navigation, color: (0.2, 7.0, 1.5)),
+        (node: "landing_light", kind: Landing, color: (9.0, 9.0, 8.0)),
+        (node: "light_tail", kind: Navigation, color: (7.0, 7.0, 6.5)),
+        (node: "beacon", kind: Beacon, color: (10.0, 0.4, 0.3)),
+    ],
+    shadow: (
+        flat: ((-0.2, 0.7, 0.0, 4.0), (0.0, 2.3, 0.0, 0.42), (-3.2, 1.2, 0.0, 0.22), (-3.85, 0.42, 0.0, 1.6)),
+        flat_z: (0.33, 0.0, -0.1, -0.1),
+        upright: ((0.0, 2.3, -0.15, 0.62), (-3.2, 1.2, -0.15, 0.3), (-4.05, 0.45, -0.85, 0.6)),
+    ),
+    parked: None,
+)

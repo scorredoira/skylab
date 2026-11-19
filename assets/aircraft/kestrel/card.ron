@@ -1,0 +1,10 @@
+// What the menu says of the Kestrel beside its picture (picture.jpg, taken by
+// scripts/menu-shots.sh). The figures are those of multirotor.ron.
+(
+    class: "Tilt-rotor gunship · twin turbine",
+    tagline: "An invented gunship on two tilting rings of rotors: collective, stick and pedals as a helicopter's, and the nacelles forward to go fast.",
+    good_for: "hovering among mountains and cliffs, low passes, landing anywhere",
+    // 1 the easiest to 5 the hardest.
+    difficulty: 4,
+    facts: [("Power", "2 × 1150 kW"), ("Fast", "300 km/h"), ("Weight", "4.8 t"), ("Rotors", "4 × 4 m")],
+)

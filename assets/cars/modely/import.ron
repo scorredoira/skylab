@@ -1,0 +1,38 @@
+// How `source.glb` becomes `exterior.glb`: `crates/games/drive/examples/import_car.rs`.
+(
+    source: "source.glb",
+    forward: "+z",
+    up: "+y",
+    scale: 1.0,
+    cg_height: 0.56,
+    front_share: 0.48,
+    materials: [
+        // The shell.
+        ("Material_2125765635", "paint"),
+        // The black of the trims, the arches' and sills' cladding, and the inside.
+        ("black_base", "trim"),
+        // The rims.
+        ("Material_2125767099", "rim"),
+        ("glass_base", "glass"),
+        ("glass_roof_panorama", "glass"),
+        ("glass_headlight222", "glass"),
+        ("front_white_light", "lamp_head"),
+        ("back_red_Light", "lamp_tail"),
+        ("material", "lamp_tail"),
+        ("red_plastic", "lamp_lens"),
+        ("mirror", "mirror"),
+        ("Rubber_Rough", "rubber"),
+        ("Rubber_Rough222", "rubber"),
+    ],
+    tyres: ["Rubber_Rough"],
+    wheels: ["Rubber_Rough222", "Iron_Clean_Distorted", "Material_111", "black.001", "black.002", "black222"],
+    // Its glass tinted as the car's is; the paint Pearl White.
+    looks: [
+        ("glass", (0.02, 0.026, 0.03), 0.0, 0.03),
+        ("paint", (0.78, 0.78, 0.76), 0.7, 0.28),
+        ("rim", (0.55, 0.56, 0.58), 1.0, 0.3),
+        ("carpet", (0.03, 0.03, 0.033), 0.0, 0.75),
+    ],
+    // The black inside the cabin is its lining, drawn as the inside is.
+    cabin: Some(((-1.35, -0.74, -1.02), (0.95, 0.74, 0.35), ["black_base"], "carpet")),
+)

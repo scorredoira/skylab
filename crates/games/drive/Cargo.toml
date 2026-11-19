@@ -1,0 +1,24 @@
+[package]
+name = "drive"
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+# The driving game: `target/release/skylab-drive`.
+[[bin]]
+name = "skylab-drive"
+path = "src/main.rs"
+
+[dependencies]
+engine = { path = "../../engine/engine" }
+sim-core = { path = "../../sim/sim-core" }
+world-render = { path = "../../engine/world-render" }
+# A trained network as a rival (`--rival net`): `ModelPilot`, the model file, the `drive` task's observation.
+sim-env = { path = "../../sim/sim-env" }
+glam.workspace = true
+bytemuck.workspace = true
+# The frames of a video (`--shot <dir> --frames <n>`), written as PNG.
+image = { version = "0.25.10", default-features = false, features = ["png"] }
+# The car's sound file (`assets/cars/<model>/sound/sound.ron`), read as sim-core reads car files.
+serde = { version = "1.0.228", features = ["derive"] }
+ron = "0.12.2"

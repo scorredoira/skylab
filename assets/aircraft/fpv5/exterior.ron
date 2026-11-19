@@ -1,0 +1,30 @@
+// What moves of exterior.glb and how, its shadow: `crates/games/flight/src/models.rs` says what
+// each field is. Body axes (x forward, y right, z down), metres, radians. The model is made by
+// `crates/games/flight/examples/quad_model.rs`. From the FPV camera nothing of it is drawn.
+(
+    parts: [
+        (node: "frame", inside: Hidden),
+        (node: "stack", inside: Hidden),
+        (node: "battery", inside: Hidden),
+        (node: "camera", inside: Hidden),
+        (node: "motors", inside: Hidden),
+        // Each propeller turns about its motor's axis at its rotor's speed: clockwise seen from
+        // above about +z, counter-clockwise about −z (the motors of multirotor.ron, in their order).
+        (node: "prop_1", moves: Rotor(index: 0), axis: (0.0, 0.0, 1.0), inside: Hidden),
+        (node: "prop_2", moves: Rotor(index: 1), axis: (0.0, 0.0, -1.0), inside: Hidden),
+        (node: "prop_3", moves: Rotor(index: 2), axis: (0.0, 0.0, -1.0), inside: Hidden),
+        (node: "prop_4", moves: Rotor(index: 3), axis: (0.0, 0.0, 1.0), inside: Hidden),
+        (node: "disc_1", moves: RotorDisc(index: 0), inside: Hidden),
+        (node: "disc_2", moves: RotorDisc(index: 1), inside: Hidden),
+        (node: "disc_3", moves: RotorDisc(index: 2), inside: Hidden),
+        (node: "disc_4", moves: RotorDisc(index: 3), inside: Hidden),
+    ],
+    lights: [],
+    // The frame and the four discs as three crossed flat pieces, the battery and camera standing.
+    shadow: (
+        flat: ((0.0, 0.13, 0.0, 0.05), (0.0, 0.05, 0.0, 0.13), (0.0, 0.10, 0.0, 0.10), (0.0, 0.0, 0.0, 0.0)),
+        flat_z: (-0.02, -0.02, -0.02, 0.0),
+        upright: ((0.0, 0.05, -0.03, 0.018), (0.0, 0.0, 0.0, 0.0), (0.0, 0.0, 0.0, 0.0)),
+    ),
+    parked: None,
+)

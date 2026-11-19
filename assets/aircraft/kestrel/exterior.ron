@@ -1,0 +1,38 @@
+// What moves of exterior.glb and how, its lights, its shadow: `crates/games/flight/src/models.rs`
+// says what each field is. Body axes (x forward, y right, z down), metres, radians. The model is
+// made in Blender by `scripts/blender/kestrel.py`. From the pilot's seat nothing of it is drawn.
+(
+    parts: [
+        (node: "airframe", inside: Hidden),
+        (node: "canopy", inside: Hidden),
+        (node: "elevator", moves: Surface(by: Elevator, scale: 1.0), axis: (0.0, 1.0, 0.0), inside: Hidden),
+        // Each nacelle turns about the line across the frame through its node, with its rotors.
+        (node: "nacelle_left", moves: Nacelle(index: 0), inside: Hidden),
+        (node: "nacelle_right", moves: Nacelle(index: 1), inside: Hidden),
+        // Each rotor turns about its motor's axis at its speed: clockwise seen from above about
+        // +z, counter-clockwise about −z (the motors of multirotor.ron, in their order).
+        (node: "prop_1", moves: Rotor(index: 0), axis: (0.0, 0.0, 1.0), inside: Hidden),
+        (node: "prop_2", moves: Rotor(index: 1), axis: (0.0, 0.0, -1.0), inside: Hidden),
+        (node: "prop_3", moves: Rotor(index: 2), axis: (0.0, 0.0, -1.0), inside: Hidden),
+        (node: "prop_4", moves: Rotor(index: 3), axis: (0.0, 0.0, 1.0), inside: Hidden),
+        (node: "disc_1", moves: RotorDisc(index: 0), inside: Hidden),
+        (node: "disc_2", moves: RotorDisc(index: 1), inside: Hidden),
+        (node: "disc_3", moves: RotorDisc(index: 2), inside: Hidden),
+        (node: "disc_4", moves: RotorDisc(index: 3), inside: Hidden),
+    ],
+    lights: [
+        (node: "light_left", kind: Navigation, color: (3.2, 0.06, 0.04)),
+        (node: "light_right", kind: Navigation, color: (0.05, 2.8, 0.7)),
+        (node: "beacon", kind: Beacon, color: (4.5, 0.08, 0.05)),
+        (node: "light_tail", kind: Navigation, color: (3.5, 3.5, 3.2)),
+        (node: "landing_light", kind: Landing, color: (9.0, 9.0, 8.0)),
+    ],
+    // The cabin and boom, the beam across the roof, and each ring, lying flat; the cabin's side
+    // and the fin standing.
+    shadow: (
+        flat: ((-0.1, 5.1, 0.0, 0.9), (0.0, 0.6, 0.0, 1.8), (0.0, 2.2, -3.9, 2.2), (0.0, 2.2, 3.9, 2.2)),
+        flat_z: (0.8, -0.4, -0.45, -0.45),
+        upright: ((0.6, 4.3, 0.8, 1.3), (-4.8, 0.8, -0.8, 0.9), (0.0, 0.0, 0.0, 0.0)),
+    ),
+    parked: None,
+)

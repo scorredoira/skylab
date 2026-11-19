@@ -1,0 +1,123 @@
+// The race course "Pinewood Airfield" flown by the race's autopilot (`racer`), from the
+// countdown: `flight --record <dir> --script scripts/video/course.ron` (with --storyboard, a still
+// of each shot), then `scripts/video/assemble.sh <dir> <out.mp4> --fps 30 --fade 0.3 <shots...>`.
+// The countdown is 3 s; then, flying, the arch at 3 s, the hangars' gate at 10 s, the flags at
+// 14 to 20 s, the dive gate at 33 s, the forest's hoops from 42 to 67 s, the ladder at 76 s, the
+// hairpin at 86 s and the finish at 90 s (add the 3 s of the countdown for a shot's `before`).
+// Low cost: 1280 x 720 at 30 frames a second, no supersampling. See crates/games/flight/src/record.rs.
+#![enable(implicit_some)]
+Script(
+    width: 1280,
+    height: 720,
+    fps: 30,
+    supersample: 1,
+    subframes: 1,
+    shutter: 0.5,
+    shots: [
+        // On the pad behind the arch: 3, 2, 1, GO, and out through it.
+        Shot(
+            name: "start",
+            args: "--course pinewood --quality high --hour 16.3 --sky fair",
+            racer: true,
+            osd: true,
+            seconds: 6.5,
+            before: 0.2,
+            still: 2.4,
+            camera: [
+                Chase(t: 0.0, yaw: 25, pitch: 10, distance: 3.2, fov: 55),
+                Chase(t: 3.5, yaw: 8, pitch: 6, distance: 3.0, fov: 55),
+                Chase(t: 6.5, yaw: 0, pitch: 5, distance: 3.4, fov: 55),
+            ],
+        ),
+        // Through its camera between the hangars and the parked aircraft, and down the flags.
+        Shot(
+            name: "hangars",
+            args: "--course pinewood --quality high --hour 16.3 --sky fair",
+            racer: true,
+            osd: true,
+            seconds: 12.0,
+            before: 9.5,
+            still: 2.8,
+            camera: [Cockpit(t: 0.0, spot: 0)],
+        ),
+        // Up over the dive gate and down through it.
+        Shot(
+            name: "dive",
+            args: "--course pinewood --quality high --hour 16.3 --sky fair",
+            racer: true,
+            seconds: 9.0,
+            before: 29.0,
+            still: 6.5,
+            camera: [
+                Chase(t: 0.0, yaw: 40, pitch: 15, distance: 9.0, fov: 55),
+                Chase(t: 9.0, yaw: 60, pitch: 30, distance: 10.0, fov: 55),
+            ],
+        ),
+        // Under the pines, through the hoops.
+        Shot(
+            name: "forest",
+            args: "--course pinewood --quality high --hour 16.3 --sky fair",
+            racer: true,
+            osd: true,
+            seconds: 26.0,
+            before: 43.0,
+            still: 8.0,
+            camera: [Cockpit(t: 0.0, spot: 0)],
+        ),
+        // The ladder on the fast straight, the hairpin and home through the arch.
+        Shot(
+            name: "home",
+            args: "--course pinewood --quality high --hour 16.3 --sky fair",
+            racer: true,
+            seconds: 26.0,
+            before: 69.0,
+            still: 8.5,
+            camera: [
+                Chase(t: 0.0, yaw: 15, pitch: 8, distance: 4.0, fov: 55),
+                Chase(t: 26.0, yaw: -15, pitch: 10, distance: 4.0, fov: 55),
+            ],
+        ),
+        // The course from high over the forest's edge, back over the field to the hangars.
+        Shot(
+            name: "overview",
+            args: "--course pinewood --quality high --hour 16.3 --sky fair",
+            seconds: 1.0,
+            before: 0.5,
+            still: 0.5,
+            camera: [Fixed(t: 0.0, eye: (470, -500, 80), fov: 50, look: (190, -200, 0))],
+        ),
+        // The same at dusk: the course a chain of coloured lights.
+        Shot(
+            name: "overview-dusk",
+            args: "--course pinewood --quality high --hour 19.1 --sky fair",
+            seconds: 1.0,
+            before: 0.5,
+            still: 0.5,
+            camera: [Fixed(t: 0.0, eye: (470, -500, 110), fov: 50, look: (190, -200, 0))],
+        ),
+        // At dusk: the LEDs glowing, from the forest's edge.
+        Shot(
+            name: "dusk",
+            args: "--course pinewood --quality high --hour 19.0 --sky fair",
+            racer: true,
+            seconds: 4.0,
+            before: 44.0,
+            still: 2.0,
+            camera: [
+                Chase(t: 0.0, yaw: 30, pitch: 14, distance: 6.0, fov: 60),
+                Chase(t: 4.0, yaw: 20, pitch: 12, distance: 6.0, fov: 60),
+            ],
+        ),
+        // At dusk through its camera, under the pines.
+        Shot(
+            name: "dusk-fpv",
+            args: "--course pinewood --quality high --hour 19.0 --sky fair",
+            racer: true,
+            osd: true,
+            seconds: 4.0,
+            before: 49.0,
+            still: 2.0,
+            camera: [Cockpit(t: 0.0, spot: 0)],
+        ),
+    ],
+)

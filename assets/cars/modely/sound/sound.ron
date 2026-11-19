@@ -1,0 +1,35 @@
+// The Model Y's sound (`crates/games/drive/src/audio.rs` reads it and mixes it). No engine: the
+// motors' whine is made by the mixer from the tones below; the tyres, the road, the wind, kerbs,
+// gravel, impacts and scraping are the GT's recordings (credited in `../../gt/sound/CREDITS.md`).
+(
+    // Orders of the rear motor's shaft (both motors turn at the same speed through the same
+    // reduction, so their tones fall together): its electrical frequency (three pairs of poles),
+    // the stator's slot harmonics, and the reduction's gears in mesh (the input pinion and the
+    // intermediate gear's), the whine an electric car is known by. Quiet: from the seat it is
+    // heard under the tyres and the wind, most when the motors pull or regenerate hard.
+    motor: (
+        tones: [
+            (order: 3.0, gain: 0.05),
+            (order: 6.0, gain: 0.03),
+            (order: 17.0, gain: 0.07),
+            (order: 34.0, gain: 0.025),
+            (order: 36.0, gain: 0.02),
+            (order: 51.0, gain: 0.03),
+        ],
+        idle: 0.25,
+        full: 1.0,
+        // The hum played to people on foot up to 30 km/h: a soft low chord.
+        avas: [196.0, 247.0, 294.0],
+        avas_gain: 0.05,
+        avas_until: 8.4,
+    ),
+    squeal: (file: "../../gt/sound/squeal.wav", gain: 0.55),
+    skid: (file: "../../gt/sound/skid.wav", gain: 0.5),
+    // Its heavier, wider all-season tyres are a little louder on the road.
+    road: (file: "../../gt/sound/road.wav", gain: 0.36),
+    kerb: (file: "../../gt/sound/kerb.wav", gain: 0.7, beat_hz: 97.771),
+    gravel: (file: "../../gt/sound/gravel.wav", gain: 0.55),
+    wind: (file: "../../gt/sound/wind.wav", gain: 0.45),
+    impact: (file: "../../gt/sound/impact.wav", gain: 1.0),
+    scrape: (file: "../../gt/sound/scrape.wav", gain: 0.45),
+)

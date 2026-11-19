@@ -1,0 +1,20 @@
+# The quickest circuit found for the race (sim-env's race search): the autopilot flies it with
+# flight --model models/race.pattern. Metres, degrees, knots, flap notches; land_reversed 1 = teardrop.
+height 255.874
+width 591.049
+final_length 1260.609
+aim 52.752
+glide 6.148
+turn_height 20.911
+upwind -273.417
+bank 33.264
+rotate_speed 53.072
+climb_speed 74.578
+pattern_speed 89.063
+descent_speed 77.224
+base_speed 71.139
+final_speed 59.503
+landing_flaps 2.000
+land_reversed 1.000
+takeoff_flaps 0.000
+flare_height 5.912

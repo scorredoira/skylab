@@ -1,0 +1,320 @@
+// Boeing 747-100 with four Pratt & Whitney JT9D-3A, at its maximum landing weight (564,000 lb).
+// Its figures are checked in crates/sim/sim-core/tests/b747.rs against the published ones: the
+// stability derivatives of NASA CR-2144 (Heffley and Jewell, "Aircraft Handling Qualities Data",
+// from Boeing's simulation of NASA CR-1756 and CR-114494, Hanke), as Nelson's and Etkin's
+// textbooks reprint them, the type's speeds and weights, and the engine's ratings.
+//
+// The format is crates/sim/sim-core/README.md's "Aircraft files". Units are SI (m, kg, N, s,
+// radians) unless the name says otherwise: _deg degrees, _kt knots, _rpm turns a minute.
+// Positions are body axes (x forward, y right, z down) from the centre of gravity of the
+// reference load, at 25 % of the mean aerodynamic chord, 31.7 m behind the nose and 5.1 m above
+// the ground.
+(
+    key: "b747",
+    name: "Boeing 747",
+    aliases: ["747", "boeing", "boeing747", "jumbo"],
+    visual: (model: "b747", cockpit: "b747"),
+
+    mass: (
+        // 564,000 lb. Inertias of CR-2144 for that weight: 14.3, 32.3 and 45.3 million slug ft².
+        mass: 255826.0,
+        inertia: (1.94e7, 4.38e7, 6.14e7),
+        // An empty weight of 162.4 t; 300 passengers and their bags, and 53 t of fuel (the tanks
+        // hold 147 t): some four hours.
+        reference_load: (front: 14000.0, rear: 16000.0, baggage: 10000.0, fuel: 53440.0),
+        // The forward and the aft cabins, the holds under the floor, the tanks in the wings.
+        stations: (
+            front: ((15.0, 0.0, -0.5), 2.5),
+            rear: ((-12.0, 0.0, -0.5), 2.5),
+            baggage: ((0.0, 0.0, 1.5), 1.5),
+            fuel: ((-1.5, 0.0, 0.8), 11.0),
+        ),
+    ),
+
+    // 5,500 ft², 195 ft 8 in of span, a mean chord of 27 ft 4 in, swept 37.5° at the quarter chord.
+    wing: (
+        area: 511.0,
+        span: 59.64,
+        chord: 8.324,
+        position: (0.9, 0.0, 0.3),
+        // The inboard flap, the inboard flap and aileron behind the inner engine, the outboard
+        // flap, the outboard aileron.
+        strip_edges: [3.25, 9.5, 15.5, 21.5],
+        flapped_strips: 3,
+        aileron_strips: 1,
+        lift_slope: 3.75,
+        cl0: 0.20,
+        // Without its leading-edge flaps the swept wing stalls early: a maximum lift of about 1.1.
+        stall_alpha_deg: 13.5,
+        stall_alpha_negative_deg: 10.0,
+        stall_sharpness: 90.0,
+        stall_hysteresis_deg: 2.0,
+        stall_lag_chords: 6.0,
+        post_stall_lift: 1.0,
+        cd0: 0.0060,
+        // An efficiency of 0.88: the best lift over drag is 17.7.
+        induced_k: 0.052,
+        ground_lift: 0.26,
+        cm: -0.05,
+        root_twist_deg: 1.0,
+        tip_twist_deg: -2.0,
+        // With the spoilers, a rolling moment coefficient of 0.064 at full wheel, flaps down
+        // (CR-2144: 0.0461 per radian of a wheel that turns 80°).
+        aileron_power: 0.11,
+        aileron_max_deg: 20.0,
+        roll_damping_relief: 0.15,
+        sweep_deg: 37.5,
+        // The outboard ailerons are locked with the flaps up: the inboard ones and the spoilers roll it.
+        aileron_clean: 0.25,
+    ),
+
+    // Triple-slotted flaps and, from flaps 1, the leading-edge flaps, which let the wing reach 17°.
+    flaps: (
+        notches_deg: [0.0, 1.0, 5.0, 10.0, 20.0, 25.0, 30.0],
+        lift_curve: [0.0, 0.12, 0.33, 0.56, 0.80, 0.92, 1.0],
+        drag_curve: [0.0, 0.05, 0.12, 0.25, 0.50, 0.75, 1.0],
+        cl: 1.1,
+        stall_shift_deg: -10.0,
+        drag: 0.05,
+        cm: -0.55,
+        downwash: 0.6,
+        // Some 40 s from up to 30.
+        rate_deg_s: 0.8,
+        // The placards: flaps 1 at 275 kt, 5 at 250, 10 at 238, 20 at 225, 25 at 200, 30 at 180.
+        speeds_kt: [275.0, 250.0, 238.0, 225.0, 200.0, 180.0],
+    ),
+
+    // 1,470 ft² of tailplane, 100 ft behind the centre of gravity: a tail volume of 1. It turns
+    // whole to trim, from 3° leading edge up to 12° down.
+    tail: (
+        position: (-31.0, 0.0, -2.2),
+        area: 136.6,
+        lift_slope: 3.5,
+        stall_deg: 16.0,
+        incidence_deg: 0.0,
+        efficiency: 0.95,
+        // CR-2144: a lift of 0.338 and a moment of -1.34 per radian of elevator.
+        elevator_tau: 0.38,
+        elevator_up_deg: 23.0,
+        elevator_down_deg: 17.0,
+        trim_range_deg: 0.0,
+        downwash_per_cl: 0.105,
+        wash: 0.0,
+        stabiliser_trim_deg: (12.0, 3.0),
+    ),
+
+    // 830 ft² of fin.
+    fin: (
+        position: (-29.0, 0.0, -7.9),
+        area: 77.1,
+        lift_slope: 3.2,
+        stall_deg: 18.0,
+        rudder_tau: 0.46,
+        rudder_max_deg: 25.0,
+        wash: 0.0,
+        swirl_factor: 0.0,
+        rig: 0.0,
+        roll_rig: 0.0,
+        rig_speed_kt: 250.0,
+        yaw_damper: 1.5,
+    ),
+
+    body: (
+        drag_area: (2.8, 245.0, 400.0),
+        roll_beta: 0.0,
+        yaw_beta: -0.085,
+        pitch_damping: 0.0,
+    ),
+
+    // JT9D-3A: 43,500 lbf at take-off with 1,510 lb/s of air through a 92 in fan; 10,200 lbf of
+    // maximum cruise thrust at 35,000 ft and Mach 0.85; 0.35 lb/h per lbf at take-off and 0.63 in
+    // cruise. The inner engines hang 11.7 m out and the outer ones 21.2 m, their nacelles 1.07 m
+    // and 1.65 m off the ground.
+    jets: (
+        engines: [
+            (at: (-1.0, -21.24, 2.15), pod: (-1.0, -21.24, 3.45)),
+            (at: (7.0, -11.73, 2.7), pod: (7.0, -11.73, 4.03)),
+            (at: (7.0, 11.73, 2.7), pod: (7.0, 11.73, 4.03)),
+            (at: (-1.0, 21.24, 2.15), pod: (-1.0, 21.24, 3.45)),
+        ],
+        static_thrust: 193500.0,
+        airflow: 685.0,
+        idle: 0.27,
+        flight_idle: 0.38,
+        redline: 1.06,
+        altitude_rating: 0.165,
+        pressure_exponent: 2.2,
+        flow_exponent: 1.3,
+        heat: 0.15,
+        // Eight seconds from ground idle to take-off thrust.
+        spool: (0.02, 0.25),
+        fuel_idle: 0.2,
+        efficiency: 0.37,
+        efficiency_cold: 1.7,
+        reverser: (share: 0.45, time: 2.0, limit: 0.9),
+        fan_diameter: 2.34,
+        n1_rpm: 3650.0,
+    ),
+
+    // Korn's relation for a wing swept 37.5° and a tenth thick: drag divergence at Mach 0.85 at
+    // the cruise's lift. The buffet boundary: the lift left before the shocks separate the flow.
+    mach: (
+        divergence: (0.938, 0.2),
+        tuck: (0.82, 0.25),
+        lift_limit: [(0.3, 1.0), (0.6, 0.95), (0.75, 0.85), (0.85, 0.72), (0.92, 0.6)],
+        mmo: 0.92,
+    ),
+
+    // Six panels a wing; the speed brake lever raises them part of the way in the air.
+    spoilers: (
+        strips: (0, 3),
+        lift: 0.6,
+        drag: 0.05,
+        flight_limit: 0.55,
+        roll: 0.6,
+        time: 1.5,
+    ),
+
+    // A nose leg and four main legs of four wheels each, where the model has them: the wing gear
+    // 10.5 m apart, the body gear 3.5 m apart and 3.25 m behind; 25.9 m from the nose leg to the
+    // middle of the main ones.
+    gear: (
+        wheels: [
+            (contact: (23.766, 0.0, 5.50), spring: 800000.0, damping: 130000.0, steers: true, brake: None, slip: 0.07, strength: 1500000.0, broken: "Landing too hard: nose gear broken"),
+            (contact: (-0.38, -5.22, 5.40), spring: 1900000.0, damping: 330000.0, steers: false, brake: Left, slip: 0.07, strength: 2400000.0, broken: "Landing too hard: left wing gear broken"),
+            (contact: (-3.61, -1.73, 5.40), spring: 1900000.0, damping: 330000.0, steers: false, brake: Left, slip: 0.07, strength: 2400000.0, broken: "Landing too hard: left body gear broken"),
+            (contact: (-3.61, 1.73, 5.40), spring: 1900000.0, damping: 330000.0, steers: false, brake: Right, slip: 0.07, strength: 2400000.0, broken: "Landing too hard: right body gear broken"),
+            (contact: (-0.38, 5.22, 5.40), spring: 1900000.0, damping: 330000.0, steers: false, brake: Right, slip: 0.07, strength: 2400000.0, broken: "Landing too hard: right wing gear broken"),
+        ],
+        travel: 0.6,
+        steer_max_deg: 30.0,
+        cg_height: 5.1,
+        ground_pitch_deg: 0.0,
+        retract: (time: 12.0, drag_area: 9.2, limit_speed_kt: 270.0),
+        // Anti-skid on a dry runway: a deceleration of 0.4 g at most.
+        braking: 0.68,
+    ),
+
+    hard_points: (
+        left_wing_tip: (-13.5, -29.82, -2.0),
+        right_wing_tip: (-13.5, 29.82, -2.0),
+        nose: (29.0, 0.0, 1.6),
+        cabin_top: (15.0, 0.0, -4.65),
+        fin_top: (-36.0, 0.0, -14.2),
+        belly: (0.0, 0.0, 2.9),
+        // The aft fuselage touches the runway at 11° of pitch.
+        tail_skid: (-27.0, 0.0, 0.6),
+    ),
+
+    // A transport: 2.5 g and -1 g, 2 g with the flaps down.
+    structure: (
+        load_limit: 2.5,
+        load_limit_negative: -1.0,
+        load_limit_flaps: 2.0,
+        ultimate_factor: 1.5,
+        vne_kt: 375.0,
+        design_dive_speed_kt: 445.0,
+        vfe_kt: (275.0, 180.0),
+        breakup_speed: 9.0,
+        aileron_chord: 0.25,
+        flap_chord: 0.3,
+        elevator_share: 0.3,
+        rudder_share: 0.3,
+        wing_tanks: Some(27.0),
+        wing_crush: 3000000.0,
+        hard_spring: (37000000.0, 1000000.0),
+    ),
+
+    floats: (
+        nose: (at: (22.0, 0.0, 1.5), volume: 600.0, depth: 5.0, area: 20.0),
+        cabin: (at: (0.0, 0.0, 2.0), volume: 1500.0, depth: 6.0, area: 40.0),
+        tail: (at: (-22.0, 0.0, 0.5), volume: 500.0, depth: 5.0, area: 15.0),
+        left_wing: (at: (-3.0, -14.0, 0.3), volume: 250.0, depth: 1.5, area: 60.0),
+        right_wing: (at: (-3.0, 14.0, 0.3), volume: 250.0, depth: 1.5, area: 60.0),
+        wheels: [
+            (at: (23.766, 0.0, 5.3), volume: 0.0, depth: 1.5, area: 3.0),
+            (at: (-0.38, -5.22, 5.4), volume: 0.0, depth: 1.5, area: 5.0),
+            (at: (-3.61, -1.73, 5.4), volume: 0.0, depth: 1.5, area: 5.0),
+            (at: (-3.61, 1.73, 5.4), volume: 0.0, depth: 1.5, area: 5.0),
+            (at: (-0.38, 5.22, 5.4), volume: 0.0, depth: 1.5, area: 5.0),
+        ],
+    ),
+
+    airframe: (
+        wing: ((-16.0, -29.82, -2.5), (12.0, 29.82, 2.0)),
+        cabin: ((-20.0, -3.25, -4.65), (31.7, 3.25, 2.9)),
+        tail_cone: ((-37.0, -2.5, -3.5), (-20.0, 2.5, 1.5)),
+        stabiliser: ((-38.0, -11.08, -3.0), (-27.0, 11.08, -1.8)),
+        fin: ((-38.0, -0.4, -14.2), (-26.0, 0.4, -3.5)),
+    ),
+
+    // Low wing, 7° of dihedral, the engines under it.
+    pieces: (
+        tail_x: -20.0,
+        wing_z: (-2.6, 4.2),
+        wing: (root: 3.25, tip: 29.82, lead: (11.7, -11.25), trail: (-2.8, -15.3), z: (1.5, -2.0), thickness: 1.6, mass: 22000.0),
+        stabiliser: (root: 1.5, tip: 11.08, lead: (-27.5, -35.5), trail: (-35.0, -38.0), z: (-2.2, -3.0), thickness: 0.7, mass: 1800.0),
+        tail_mass: 12000.0,
+        fuselage: (
+            centre: (5.0, 0.0, -0.3),
+            points: [(31.7, 0.0, 0.0), (20.0, -3.2, 0.5), (20.0, 3.2, 0.5), (-15.0, -3.2, 0.5), (-15.0, 3.2, 0.5), (15.0, 0.0, -4.65), (0.0, 0.0, 2.9), (24.0, 0.0, 2.6), (-20.0, 0.0, 1.5), (-20.0, 0.0, -3.5)],
+            drag_area: 150.0,
+            size: (52.0, 6.5, 7.6),
+        ),
+        left_wing: (
+            centre: (-2.0, -13.0, 0.3),
+            points: [(11.7, -3.25, 1.5), (-2.8, -3.25, 1.5), (-11.25, -29.82, -2.0), (-15.3, -29.82, -2.0), (7.0, -11.73, 4.03), (-1.0, -21.24, 3.45)],
+            drag_area: 200.0,
+            size: (10.0, 26.5, 1.6),
+        ),
+        right_wing: (
+            centre: (-2.0, 13.0, 0.3),
+            points: [(11.7, 3.25, 1.5), (-2.8, 3.25, 1.5), (-11.25, 29.82, -2.0), (-15.3, 29.82, -2.0), (7.0, 11.73, 4.03), (-1.0, 21.24, 3.45)],
+            drag_area: 200.0,
+            size: (10.0, 26.5, 1.6),
+        ),
+        tail: (
+            centre: (-29.0, 0.0, -3.0),
+            points: [(-20.0, 0.0, 1.5), (-20.0, 0.0, -3.5), (-37.0, 0.0, -1.5), (-37.0, -11.08, -3.0), (-37.0, 11.08, -3.0), (-37.5, 0.0, -14.2), (-27.0, 0.0, 0.6)],
+            drag_area: 120.0,
+            size: (17.0, 22.2, 12.0),
+        ),
+    ),
+
+    // In the air at 250 kt, clean; on final at the reference speed of this weight plus five, flaps 30.
+    start: (air_speed_kt: 250.0, final_speed_kt: 146.0, final_flap_notch: 6, takeoff_flap_notch: 3, runway: 2400.0),
+
+    // At 564,000 lb: a reference speed of 141 kt with flaps 30; flaps up no slower than 221 kt.
+    speeds: (
+        stall_clean_kt: 170.0,
+        stall_full_kt: 110.0,
+        least_kt: 180.0,
+        most_kt: 340.0,
+        flaps_kt: 230.0,
+        rotate_kt: 145.0,
+        // In the circuit: cleaning up as it climbs to 210 kt, downwind with flaps 5.
+        climb_kt: 210.0,
+        pattern_kt: 210.0,
+        descent_kt: 185.0,
+        base_kt: 165.0,
+        final_approach_kt: 146.0,
+        join_kt: 220.0,
+        cruise_kt: 300.0,
+    ),
+
+    // Static ports on both sides, heated probes, gyros with their own motors.
+    instruments: (
+        static_ports: BothSides,
+        static_error: [],
+        alternate_static: None,
+        pitot_heat: true,
+        attitude: Electric,
+        heading: Electric,
+        attitude_pitch_limit_deg: 85.0,
+        compass_lubber_deg: 0.5,
+        compass_iron: (0.01, -0.012, 0.015),
+        airspeed_marks: (white_kt: Some((110.0, 180.0)), green_kt: (170.0, 375.0), red_line_kt: 375.0, dial_top_kt: 450.0),
+    ),
+
+    autopilot: None,
+)

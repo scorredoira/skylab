@@ -1,0 +1,132 @@
+// A 5-inch racing quad as raced today: a 220 mm true-X frame of 5 mm carbon arms, four 2207
+// motors of 1950 kV on a 6S 1300 mAh pack, 5.1x4.3 three-blade race propellers, an FPV camera
+// tilted up 40° behind a wide lens. 500 g all up, some 13.5:1 thrust to weight, 170 km/h flat out.
+//
+// Sources, for the figures of the class (makers' published sheets and thrust stands, no code):
+// - Motors: T-Motor's F60 Pro V 1950 kV (2207.5) sheet, as its sellers list it: 32.4 g, 1.1 to
+//   1.2 A with no load, 48 to 49 A for ten seconds, some 1.2 kW and up to 1.97 kg of thrust with
+//   a 5-inch propellor on 6S; the F60 Pro IV 1950 kV's sheet gives its winding as 51 mΩ. Other
+//   2207 1900 to 2000 kV racing motors (Emax, BrotherHobby, iFlight) give the same within a tenth.
+// - Propellers: the thrust stands' tables for 5.1x4.3 three-blade race props on such motors
+//   (miniquadtestbench.com among them): 1.6 to 1.9 kg each near 30 000 rpm on 6S, the torque
+//   some 1.4 % of the thrust in N m per N (a higher pitch and a third blade over a 5x3's 1.2 %).
+// - Battery: Tattu's R-Line 6S 1300 mAh (V4 to V6): 78 x 39 x 33 to 38 mm, 200 g; 3 to 4 mΩ a
+//   cell new, the same 4.20 to 3.30 V curve of a lithium-polymer cell as fpv5's.
+// - The rest of the weight: a race frame 100 to 110 g, the stack (flight controller and a 4-in-1
+//   55 A ESC) 15 g, camera, video transmitter, receiver and antennas 20 g, props 4 x 4.4 g, strap,
+//   wires and screws 20 g: some 300 g dry, 500 g with the pack. Race pilots set the camera up 35
+//   to 45° and fly some 150 to 180 km/h on the straights (GPS logs of such quads).
+// What none gives (drag areas, inertia, a disc's edgewise drag) is estimated, said so below, from
+// fpv5's by the size of the parts, and checked in crates/sim/sim-core/tests/multirotor.rs.
+//
+// The format is crates/sim/sim-core/README.md's "Multirotor files"; units as in fpv5's file.
+(
+    key: "race5",
+    name: "Race quad 5\"",
+    aliases: ["race", "racequad", "race_quad", "racing"],
+    // The camera on the front between the side plates, tilted up 40° for racing nose down; the
+    // lens a race camera's 1.8 mm, as wide as fpv5's seen diagonally.
+    visual: (model: "race5", camera: (position: (0.058, 0.0, -0.010), uptilt_deg: 40.0, fov_deg: 125.0)),
+
+    mass: (
+        // 300 g of frame, motors, electronics and camera, 200 g of battery.
+        mass: 0.50,
+        // Estimated as fpv5's for the lighter frame and pack: the battery on top, the motors 11 cm
+        // out on the diagonals (2 x 34 g x 0.11² per axis is 0.0008 of it).
+        inertia: (0.0019, 0.0022, 0.0037),
+    ),
+
+    frame: (
+        // Estimated: a slimmer frame than fpv5's (its arms 5 mm thick, no side guards), the pack
+        // lower and narrower: the area seen from ahead, the side and above, drag coefficient 1.
+        drag_area: (0.0040, 0.0050, 0.0220),
+        rotational_damping: 0.00025,
+        // Under each motor, on top of each bell, the tips of the propellers, the camera, the rear
+        // of the frame and the top of the battery.
+        contacts: [
+            (-0.0778, 0.0778, 0.010), (0.0778, 0.0778, 0.010), (-0.0778, -0.0778, 0.010), (0.0778, -0.0778, 0.010),
+            (-0.0778, 0.0778, -0.030), (0.0778, 0.0778, -0.030), (-0.0778, -0.0778, -0.030), (0.0778, -0.0778, -0.030),
+            (-0.1236, 0.1236, -0.024), (0.1236, 0.1236, -0.024), (-0.1236, -0.1236, -0.024), (0.1236, -0.1236, -0.024),
+            (0.066, 0.0, -0.008), (-0.072, 0.0, 0.004),
+            (0.038, 0.0, -0.052), (-0.038, 0.0, -0.052),
+        ],
+        // Per point: four points carry its weight 1.2 mm down.
+        contact_spring: 1000.0,
+        contact_damping: 5.0,
+        friction: 0.7,
+        // Race frames take as much as freestyle ones: arms or the camera break harder than this, m/s.
+        crash_speed: 10.0,
+        solid: [((-0.13, -0.13, -0.055), (0.13, 0.13, 0.02))],
+        // The frame as balls (centre, radius) that other things strike: the stack and battery
+        // along the middle, the camera, each arm halfway out and each motor's bell.
+        parts: [
+            ((-0.038, 0.0, -0.020), 0.030), ((0.0, 0.0, -0.020), 0.030), ((0.038, 0.0, -0.020), 0.030), ((0.060, 0.0, -0.010), 0.017),
+            ((-0.039, 0.039, 0.004), 0.012), ((0.039, 0.039, 0.004), 0.012), ((-0.039, -0.039, 0.004), 0.012), ((0.039, -0.039, 0.004), 0.012),
+            ((-0.0778, 0.0778, -0.009), 0.016), ((0.0778, 0.0778, -0.009), 0.016), ((-0.0778, -0.0778, -0.009), 0.016), ((0.0778, -0.0778, -0.009), 0.016),
+        ],
+        // Carbon and the hard plastic of the pack: a dull knock, as fpv5's.
+        restitution: 0.3,
+    ),
+
+    // Quad X, the flight controllers' order: rear right, front right, rear left, front left; the
+    // propellers turning in at the front.
+    motors: [
+        (position: (-0.0778, 0.0778, -0.022), spin: Clockwise),
+        (position: (0.0778, 0.0778, -0.022), spin: CounterClockwise),
+        (position: (-0.0778, -0.0778, -0.022), spin: CounterClockwise),
+        (position: (0.0778, -0.0778, -0.022), spin: Clockwise),
+    ],
+    motor: (
+        kv_rpm: 1950.0,
+        resistance: 0.051,
+        no_load_current: 1.15,
+        // A 2207's bell and rotor 2 g cm², the three-blade propeller 5 g cm².
+        rotor_inertia: 7.0e-6,
+        // What the sheets give for ten seconds; the ESCs are rated over it.
+        max_current: 48.0,
+        // The ESCs keep the motors turning at 5 % while armed.
+        idle: 0.05,
+    ),
+    propeller: (
+        // 5.1 inches.
+        diameter: 0.1295,
+        // 4.3 inches.
+        pitch: 0.109,
+        // 1.55 kg of thrust at 3230 rad/s (30 800 rpm), where 48 A holds it on a sagging pack; the
+        // torque 1.4 % of the thrust.
+        thrust_coefficient: 1.45e-6,
+        torque_coefficient: 2.2e-8,
+        // Estimated: fpv5's two blades' drag of a disc moving sideways, a third more for three.
+        edgewise_drag: 1.5e-5,
+        // As fpv5's (`PropStrike`): the same plastic, a little thinner disc of three blades.
+        strike: (thickness: 0.012, graze_speed: 1.5, chip_depth: 0.008, stub: 0.25, shake: 2.0),
+    ),
+    // Its own wash, as fpv5's (the same fit to what FPV pilots see).
+    wash: (onset: 0.5, full: 4.0, clear_from: 0.3, clear_to: 0.7, thrust_loss: 0.1, fluctuation: 0.5, buffet: 0.5, correlation_time: 0.05),
+    battery: (
+        cells: 6,
+        capacity_mah: 1300.0,
+        // 3.5 mΩ a cell and the leads.
+        internal_resistance: 0.024,
+        cell_voltage: [(0.0, 4.20), (0.05, 4.08), (0.15, 3.97), (0.3, 3.87), (0.5, 3.79), (0.7, 3.72), (0.85, 3.62), (0.93, 3.50), (1.0, 3.30)],
+    ),
+    controller: (
+        // Self-levelled only, as fpv5: the roll and pitch sticks ask for angles up to
+        // `angle_max_deg`, the yaw stick for a rate: 444°/s at full stick, 110°/s at half, a racer's
+        // yaw. The most it tilts is set high, as race pilots who fly levelled set it: 75° holds it
+        // level at some 170 km/h.
+        rates: (rc_rate: (1.0, 1.0, 1.0), super_rate: (0.7, 0.7, 0.55), expo: (0.0, 0.0, 0.3)),
+        // The rate loop, as angular accelerations (it has more authority than fpv5: a little more
+        // gain, the same shape).
+        p: (24.0, 24.0, 14.0),
+        i: (70.0, 70.0, 35.0),
+        d: (0.015, 0.015, 0.0),
+        feed_forward: (0.5, 0.5, 0.5),
+        i_limit: 100.0,
+        angle_max_deg: 75.0,
+        angle_gain: 8.0,
+    ),
+    start: (
+        air_height: 15.0,
+    ),
+)

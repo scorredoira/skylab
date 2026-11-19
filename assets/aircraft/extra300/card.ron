@@ -1,0 +1,10 @@
+// What the menu says of this aircraft beside its picture (picture.jpg, taken by scripts/menu-shots.sh).
+// The figures are those of aircraft.ron and of the handbook it follows.
+(
+    class: "Aerobatic · tailwheel",
+    tagline: "An unlimited aerobatic monoplane: 400° a second of roll and ±10 g, on a tailwheel that asks for your feet.",
+    good_for: "aerobatics, spins, flying upside down",
+    // 1 the easiest to 5 the hardest.
+    difficulty: 4,
+    facts: [("Cruise", "169 kt"), ("Stall", "55 kt"), ("Weight", "791 kg"), ("Engine", "300 hp")],
+)

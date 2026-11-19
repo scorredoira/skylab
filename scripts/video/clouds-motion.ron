@@ -1,0 +1,34 @@
+// The clouds in motion, as the game draws them (a picture a frame, no blur): out of a cumulus into
+// the sun, and a fast turn of the camera (100 degrees a second). To see what their upscale over
+// the frames (`clouds_draw.wgsl`) does with what it has not seen before:
+// `skylab --record <dir> --script scripts/video/clouds-motion.ron`.
+#![enable(implicit_some)]
+Script(
+    width: 1600,
+    height: 1000,
+    fps: 60,
+    supersample: 1,
+    subframes: 1,
+    shots: [
+        Shot(
+            name: "exit",
+            args: "--place LEMH --offline --quality high --hour 18.3 --sky fair --air --aircraft c172",
+            seconds: 2.5,
+            start: Over(n: 0, e: 1400, heading: 270, agl: 1900),
+            hold: true,
+            fast: (0.0, 4.0),
+            camera: [Cockpit(t: 0.0, spot: 0, fov: 66), Cockpit(t: 4.0, spot: 0, fov: 62)],
+        ),
+        Shot(
+            name: "turn",
+            args: "--place LEMH --offline --quality high --hour 18.3 --sky fair --air --aircraft c172",
+            seconds: 2.4,
+            start: Over(n: 0, e: 1400, heading: 270, agl: 1500),
+            hold: true,
+            camera: [
+                Chase(t: 0.0, yaw: 0, pitch: 4, distance: 20, fov: 50),
+                Chase(t: 2.4, yaw: 240, pitch: 4, distance: 20, fov: 50),
+            ],
+        ),
+    ],
+)

@@ -1,0 +1,5 @@
+"id","ident","type","name","latitude_deg","longitude_deg","elevation_ft","continent","iso_country","iso_region","municipality","scheduled_service","icao_code","iata_code","gps_code","local_code","home_link","wikipedia_link","keywords"
+4021,"LEMH","large_airport","Menorca Airport",39.862598,4.21865,302,"EU","ES","ES-IB","Mahón (Maó)","yes","LEMH","MAH","LEMH",,"https://www.aena.es/en/menorca.html","https://en.wikipedia.org/wiki/Menorca_Airport","Menorca"
+4036,"LESL","small_airport","Sant Lluis Airfield",39.861878,4.251739,197,"EU","ES","ES-IB","Sant Lluis","no","LESL",,"LESL",,,"https://en.wikipedia.org/wiki/San_Luis_Aerodrome","San Luis"
+4431,"LOWI","large_airport","Innsbruck Airport",47.260201,11.344,1907,"EU","AT","AT-7","Innsbruck","yes","LOWI","INN","LOWI",,"http://www.innsbruck-airport.com/","https://en.wikipedia.org/wiki/Innsbruck_Airport","Kranebitten Airport"
+6523,"00A","heliport","Total RF Heliport",40.070985,-74.933689,11,"NA","US","US-PA","Bensalem","no",,,"K00A","00A","https://www.penndot.pa.gov/TravelInPA/airports-pa/Pages/Total-RF-Heliport.aspx",,

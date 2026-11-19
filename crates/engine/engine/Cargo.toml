@@ -1,0 +1,67 @@
+[package]
+name = "engine"
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+glam.workspace = true
+bytemuck.workspace = true
+# Graphics on Metal, Vulkan and DirectX through one API.
+wgpu = "30.0.2"
+# Window, keyboard and mouse on every operating system.
+winit = "0.30.13"
+# 2D overlay: text, menus and vector drawing for instruments. Its own fonts, so it looks the same everywhere.
+egui = { version = "0.37.0", features = ["default_fonts"] }
+# Its defaults add WebGL (wgpu-core) to the web build and pretend wgpu is Send there, which it is not
+# with threads: only the web goes without them (native turns them on below).
+egui-wgpu = { version = "0.37.0", default-features = false }
+# Without its defaults here: the clipboard (arboard) has no web backend. Native turns them all on below.
+egui-winit = { version = "0.37.0", default-features = false, features = ["links"] }
+# Sound output: CoreAudio, ALSA..., and WebAudio on the web (its `wasm-bindgen` feature, below).
+cpal = "0.18.2"
+# Models (`gltf.rs`): glTF 2.0 read without its importer (the engine reads embedded data and decodes
+# the images itself), and its JSON written with serde_json.
+gltf = { version = "1.4.1", default-features = false, features = ["utils", "names"] }
+serde_json = "1.0.149"
+# Writing PNG screenshots; later, reading textures.
+image = { version = "0.25.10", default-features = false, features = ["png", "jpeg"] }
+# Gamepads and joysticks (flight sticks, wheels) on macOS, Linux and Windows through one API, with the
+# community database of button layouts built in; winit has no controller input. On Linux it needs libudev.
+gilrs = "0.11.2"
+# The clock: std's natively (the same type, re-exported), the browser's on the web, where std's panics.
+web-time = "1.1.0"
+
+# Native only: the clipboard and the Linux window systems of the overlay (egui-winit's defaults),
+# and egui-wgpu's defaults.
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+egui-winit = { version = "0.37.0", features = ["default"] }
+egui-wgpu = { version = "0.37.0", features = ["default"] }
+# Runs the two async calls that set up the GPU. The web must not block: it awaits them (`app::run`).
+pollster = "1.0.1"
+
+# macOS: the Dock's icon while the game runs (`icon.rs`). The versions winit's own dependencies
+# already bring in, with only the classes it needs.
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2 = "0.6.5"
+objc2-foundation = { version = "0.3.2", default-features = false, features = ["std", "NSData", "NSString", "NSDictionary", "NSValue", "NSURL", "NSError", "NSArray"] }
+objc2-app-kit = { version = "0.3.2", default-features = false, features = ["std", "NSApplication", "NSImage", "NSResponder"] }
+# The recordings (`video`): the system's writer of video files and its encoders (H.264, AAC).
+objc2-av-foundation = { version = "0.3.2", default-features = false, features = ["std", "AVAssetWriter", "AVAssetWriterInput", "AVMediaFormat", "AVVideoSettings", "objc2-core-media", "objc2-core-video"] }
+objc2-avf-audio = { version = "0.3.2", default-features = false, features = ["std", "AVAudioSettings"] }
+objc2-core-media = { version = "0.3.2", default-features = false, features = ["std", "CMBase", "CMTime", "CMSampleBuffer", "CMBlockBuffer", "CMFormatDescription", "objc2-core-audio-types"] }
+objc2-core-video = { version = "0.3.2", default-features = false, features = ["std", "CVBase", "CVBuffer", "CVImageBuffer", "CVPixelBuffer", "CVPixelBufferPool", "CVReturn"] }
+objc2-core-audio-types = { version = "0.3.2", default-features = false, features = ["std", "CoreAudioBaseTypes"] }
+objc2-core-foundation = { version = "0.3.2", default-features = false, features = ["std", "CFString"] }
+
+# The local hour of the day (`clock.rs`): the C library's `localtime_r`, which knows the time zone.
+[target.'cfg(unix)'.dependencies]
+libc = "0.2.191"
+
+# The web: the browser's window, workers, storage and console from Rust (see `web.rs`).
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+cpal = { version = "0.18.2", features = ["wasm-bindgen"] }
+wasm-bindgen = "0.2.130"
+wasm-bindgen-futures = "0.4.80"
+js-sys = "0.3.107"
+web-sys = { version = "0.3.107", features = ["Window", "Document", "Element", "HtmlCanvasElement", "Response", "Storage", "Worker", "WorkerOptions", "WorkerType", "console"] }

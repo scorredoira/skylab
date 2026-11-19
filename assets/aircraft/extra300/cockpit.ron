@@ -1,0 +1,150 @@
+// The cockpit of cockpit.glb: what moves of it with the controls, where the eye can be, the
+// instruments and where they are painted, what is printed, what the mouse takes and clicks.
+// `crates/games/flight/src/cockpit/file.rs` says what each field is. Body axes (x forward, y right,
+// z down), metres, radians; the canvases in points.
+(
+    parts: [
+        (
+            node: "cabin",
+        ),
+        (
+            node: "stick",
+            moves: Stick(lean: 0.3),
+        ),
+        (
+            node: "throttle",
+            moves: Turn(by: Throttle, angle: -1.0),
+            axis: (0.0, 1.0, 0.0),
+        ),
+        (
+            node: "pedals_left",
+            moves: Slide(by: Rudder, along: (-0.05, 0.0, 0.0)),
+        ),
+        (
+            node: "pedals_right",
+            moves: Slide(by: Rudder, along: (0.05, 0.0, 0.0)),
+        ),
+    ],
+    glass: "glass",
+    spots: [
+        Seat(
+            name: "pilot",
+            eye: (-0.55, 0.0, -0.66),
+            fov: 62.0,
+            shift: 0.12,
+        ),
+        Seat(
+            name: "pilot, leaning in",
+            eye: (-0.47000003, 0.0, -0.62),
+            fov: 46.0,
+            shift: 0.55,
+        ),
+        LookingAt(
+            name: "panel",
+            eye: (-0.36, 0.0, -0.5),
+            at: (-0.07, 0.0, -0.35),
+            height: 0.36,
+        ),
+        LookingAt(
+            name: "instruments",
+            eye: (-0.26, 0.0, -0.44),
+            at: (-0.07, 0.0, -0.39),
+            height: 0.22,
+        ),
+        LookingAt(
+            name: "levers",
+            eye: (-0.55, -0.12, -0.45),
+            at: (-0.38, -0.31, -0.18),
+            height: 0.34,
+        ),
+    ],
+    sky_box: ((-1.45, -0.45, -1.02), (1.1, 0.45, 0.42)),
+    canvas: (512.0, 256.0),
+    instruments: [
+        (
+            kind: Airspeed,
+            at: (0.0, 0.0, 128.0, 128.0),
+        ),
+        (
+            kind: Altimeter,
+            at: (128.0, 0.0, 128.0, 128.0),
+        ),
+        (
+            kind: Accelerometer,
+            at: (256.0, 0.0, 128.0, 128.0),
+        ),
+        (
+            kind: Tachometer,
+            at: (384.0, 0.0, 128.0, 128.0),
+        ),
+        (
+            kind: VerticalSpeed,
+            at: (0.0, 128.0, 128.0, 128.0),
+        ),
+        (
+            kind: TurnCoordinator,
+            at: (128.0, 128.0, 128.0, 128.0),
+        ),
+        (
+            kind: CompassCard,
+            at: (384.0, 128.0, 128.0, 80.0),
+            clip: true,
+        ),
+        (
+            kind: Radio(active: "122.800", standby: "118.000"),
+            at: (256.0, 128.0, 128.0, 32.0),
+        ),
+    ],
+    print: (
+        size: (1024.0, 416.0),
+        panel: (
+            min: (-0.34, -0.52),
+            size: (0.68, 0.27625),
+            top: 0.0,
+            points: 1024.0,
+        ),
+        floor: (
+            min: (0.0, 0.0),
+            size: (1.0, 1.0),
+            top: 416.0,
+            points: 0.0,
+        ),
+        panel_x: -0.27,
+        shapes: [
+            Text(at: (205.32353, 504.2264), text: "MASTER", size: 2.9281042, color: (232, 232, 232, 255)),
+            Text(at: (208.96416, 456.28818), text: "ON", size: 2.509804, color: (232, 232, 232, 255)),
+            Text(at: (283.78952, 504.2264), text: "ALT", size: 2.9281042, color: (232, 232, 232, 255)),
+            Text(at: (284.25827, 456.28818), text: "ON", size: 2.509804, color: (232, 232, 232, 255)),
+            Text(at: (353.77115, 504.2264), text: "FUEL PUMP", size: 2.9281042, color: (232, 232, 232, 255)),
+            Text(at: (359.5524, 456.28818), text: "ON", size: 2.509804, color: (232, 232, 232, 255)),
+            Text(at: (657.2601, 504.2264), text: "STROBE", size: 2.9281042, color: (232, 232, 232, 255)),
+            Text(at: (660.7288, 456.28818), text: "ON", size: 2.509804, color: (232, 232, 232, 255)),
+            Text(at: (731.53864, 504.2264), text: "AVIONICS", size: 2.9281042, color: (232, 232, 232, 255)),
+            Text(at: (736.023, 456.28818), text: "ON", size: 2.509804, color: (232, 232, 232, 255)),
+            Text(at: (888.3282, 439.4735), text: "MAGNETOS", size: 2.9281042, color: (232, 232, 232, 255)),
+            Text(at: (867.8236, 460.17792), text: "OFF", size: 2.3006535, color: (232, 232, 232, 255)),
+            Text(at: (880.23804, 450.80762), text: "R", size: 2.3006535, color: (232, 232, 232, 255)),
+            Text(at: (895.42194, 447.3779), text: "L", size: 2.3006535, color: (232, 232, 232, 255)),
+            Text(at: (908.0432, 450.80762), text: "BOTH", size: 2.3006535, color: (232, 232, 232, 255)),
+            Text(at: (918.8327, 460.17792), text: "START", size: 2.3006535, color: (232, 232, 232, 255)),
+            Rect(min: (602.35297, 346.35294), max: (903.5294, 414.1176), radius: (2, 2, 2, 2), fill: (205, 205, 205, 255), stroke: (0.0, (0, 0, 0, 0)), edge: Outside),
+            Text(at: (729.8943, 356.89996), text: "AEROBATIC CATEGORY  +10 G  /  -10 G", size: 2.718954, color: (20, 20, 22, 255)),
+            Text(at: (735.8318, 372.71173), text: "VNE 220 KIAS     VA 158 KIAS", size: 2.718954, color: (20, 20, 22, 255)),
+            Text(at: (732.62866, 388.5235), text: "NO SNAP ROLLS ABOVE 140 KIAS", size: 2.718954, color: (20, 20, 22, 255)),
+            Text(at: (732.05054, 404.33527), text: "SOLO FROM THE REAR SEAT ONLY", size: 2.718954, color: (20, 20, 22, 255)),
+            Circle(centre: (45.17647, 52.705833), radius: 3.9152942, fill: (125, 125, 125, 255), stroke: (0.0, (0, 0, 0, 0))),
+            Line(from: (42.465885, 52.705833), to: (47.88706, 52.705833), width: 0.90352947, color: (40, 40, 40, 255)),
+            Circle(centre: (978.8235, 52.705833), radius: 3.9152942, fill: (125, 125, 125, 255), stroke: (0.0, (0, 0, 0, 0))),
+            Line(from: (976.1129, 52.705833), to: (981.53406, 52.705833), width: 0.90352947, color: (40, 40, 40, 255)),
+            Circle(centre: (45.17647, 542.1176), radius: 3.9152942, fill: (125, 125, 125, 255), stroke: (0.0, (0, 0, 0, 0))),
+            Line(from: (42.465885, 542.1176), to: (47.88706, 542.1176), width: 0.90352947, color: (40, 40, 40, 255)),
+            Circle(centre: (978.8235, 542.1176), radius: 3.9152942, fill: (125, 125, 125, 255), stroke: (0.0, (0, 0, 0, 0))),
+            Line(from: (976.1129, 542.1176), to: (981.53406, 542.1176), width: 0.90352947, color: (40, 40, 40, 255)),
+            Text(at: (88.364876, 282.49258), text: "EXTRA 300L", size: 6.27451, color: (232, 232, 232, 255)),
+        ],
+    ),
+    levers: [
+        (Throttle, ((-0.44232532, -0.31, -0.29408574), (-0.31767467, -0.31, -0.29408574))),
+    ],
+    controls: [],
+)

@@ -1,0 +1,138 @@
+// A 5-inch freestyle FPV quadcopter: a 225 mm X frame of carbon plates, four 2306 motors of
+// 2400 kV on a 4S 1300 mAh lithium-polymer pack, 5x3 two-blade propellers, an FPV camera tilted
+// up 25° behind a 120° lens. 650 g all up, about 4:1 thrust to weight.
+//
+// Sources, for the typical figures of the class: the motor makers' sheets for 2306 motors
+// (65 to 75 mΩ, about 1.2 A with no load at 10 V, 40 to 50 A for a few seconds), thrust stands'
+// tables of 5-inch propellers (thrust and torque against speed: a two-blade 5x3 gives some
+// 0.6 kg near 28 000 rpm, its torque about 1.2 % of its thrust in N m per N), the packs'
+// discharge curves (4.20 V a cell full, under 3.8 at half, 3.3 empty with nothing drawn; some
+// 6 mΩ a cell) and a frame's parts (bells and props, 5 to 7 g cm² a rotor). What none gives (the
+// frame's drag areas, its inertia, the edgewise drag of a disc) is estimated, said so below, and
+// checked against how such quads fly in crates/sim/sim-core/tests/multirotor.rs.
+//
+// The format is crates/sim/sim-core/README.md's "Multirotor files". Units are SI (m, kg, N, s,
+// radians, A, V, Ω) unless the name says otherwise: _deg degrees, _rpm turns a minute, _mah
+// milliamp-hours. Positions are body axes (x forward, y right, z down) from the centre of gravity.
+(
+    key: "fpv5",
+    name: "FPV quad 5\"",
+    aliases: ["fpv", "quad", "drone", "quadcopter", "5inch"],
+    // The model the game draws (a folder of assets/aircraft), and the FPV camera: on the front of
+    // the frame, between the side plates, tilted up for flying fast nose down.
+    visual: (model: "fpv5", camera: (position: (0.060, 0.0, -0.012), uptilt_deg: 25.0, fov_deg: 120.0)),
+
+    mass: (
+        // 460 g of frame, motors, electronics and camera, 190 g of battery.
+        mass: 0.65,
+        // Estimated: the battery on top and the four motors 11 cm out on the diagonals.
+        inertia: (0.0028, 0.0030, 0.0050),
+    ),
+
+    frame: (
+        // Estimated: drag coefficient (about 1) times the area seen from ahead, the side and above.
+        drag_area: (0.0045, 0.0060, 0.0250),
+        rotational_damping: 0.0003,
+        // Under each motor, on top of each bell, the tips of the propellers, the camera, the rear
+        // of the frame and the top of the battery.
+        contacts: [
+            (-0.0795, 0.0795, 0.012), (0.0795, 0.0795, 0.012), (-0.0795, -0.0795, 0.012), (0.0795, -0.0795, 0.012),
+            (-0.0795, 0.0795, -0.030), (0.0795, 0.0795, -0.030), (-0.0795, -0.0795, -0.030), (0.0795, -0.0795, -0.030),
+            (-0.124, 0.124, -0.025), (0.124, 0.124, -0.025), (-0.124, -0.124, -0.025), (0.124, -0.124, -0.025),
+            (0.068, 0.0, -0.010), (-0.075, 0.0, 0.004),
+            (0.035, 0.0, -0.055), (-0.035, 0.0, -0.055),
+        ],
+        // Per point: four points carry its weight 1.6 mm down.
+        contact_spring: 1000.0,
+        contact_damping: 6.0,
+        friction: 0.7,
+        // Carbon frames take a lot: what breaks arms or the camera against hard ground, m/s.
+        crash_speed: 10.0,
+        solid: [((-0.13, -0.13, -0.06), (0.13, 0.13, 0.02))],
+        // The frame as balls (centre, radius) that another quad's frame and propellers strike: the
+        // stack and battery along the middle, the camera, each arm halfway out and each motor's bell.
+        parts: [
+            ((-0.040, 0.0, -0.020), 0.032), ((0.0, 0.0, -0.020), 0.032), ((0.040, 0.0, -0.020), 0.032), ((0.062, 0.0, -0.012), 0.018),
+            ((-0.040, 0.040, 0.004), 0.014), ((0.040, 0.040, 0.004), 0.014), ((-0.040, -0.040, 0.004), 0.014), ((0.040, -0.040, 0.004), 0.014),
+            ((-0.0795, 0.0795, -0.009), 0.016), ((0.0795, 0.0795, -0.009), 0.016), ((-0.0795, -0.0795, -0.009), 0.016), ((0.0795, -0.0795, -0.009), 0.016),
+        ],
+        // Frame against frame, carbon and the hard plastic of the battery strap: a dull knock.
+        // Estimated, as for a hard body hitting another (0.2 to 0.4).
+        restitution: 0.3,
+    ),
+
+    // In the order of the flight controllers' quad X: rear right, front right, rear left, front
+    // left; the propellers turning in at the front.
+    motors: [
+        (position: (-0.0795, 0.0795, -0.022), spin: Clockwise),
+        (position: (0.0795, 0.0795, -0.022), spin: CounterClockwise),
+        (position: (-0.0795, -0.0795, -0.022), spin: CounterClockwise),
+        (position: (0.0795, -0.0795, -0.022), spin: Clockwise),
+    ],
+    motor: (
+        kv_rpm: 2400.0,
+        resistance: 0.070,
+        no_load_current: 1.2,
+        // Bell and rotor 1.5 g cm², the propeller 4.5 g cm².
+        rotor_inertia: 6.0e-6,
+        max_current: 45.0,
+        // The ESCs keep the motors turning at 5.5 % while armed.
+        idle: 0.055,
+    ),
+    propeller: (
+        diameter: 0.127,
+        // 3 inches.
+        pitch: 0.0762,
+        thrust_coefficient: 6.5e-7,
+        torque_coefficient: 7.8e-9,
+        // Estimated: the drag of a disc moving sideways through the air, per rad/s and m/s.
+        edgewise_drag: 1.2e-5,
+        // A disc meeting something solid while it turns (another quad's frame or propellers): its
+        // tips run at some 160 m/s at racing speeds (24 000 rpm), and a blade passes any point of
+        // the disc every 1.2 ms. Touching slower than `graze_speed` (m/s) the thing moves under
+        // 2 mm between two passes and some 6 mm in a step of the world: only a tip goes, a chip.
+        // Faster, or a blade that has lost more than `chip_depth` (m: past that the plastic of a
+        // 5-inch blade cracks across under the blow), the propeller breaks: both blades shatter to
+        // `stub` (a share of the radius, what is left at the hub) and its thrust is gone. A chip
+        // leaves its blades uneven: the rotor shakes, its thrust coming and going by `shake` times
+        // the difference of their swept areas (the share of each blade's radius squared), as in
+        // its own wash. The disc is `thickness` (m) thick. Estimated from what FPV pilots see:
+        // a touch of props at speed downs both quads, a slow nudge chips a tip and it flies on,
+        // shaking.
+        strike: (thickness: 0.012, graze_speed: 1.5, chip_depth: 0.008, stub: 0.25, shake: 2.0),
+    ),
+    // Its own wash (the vortex ring state, "propwash"): sinking from half to four times as fast
+    // as a rotor pushes the air down (its induced velocity, some 7 m/s in the hover, 1 m/s at
+    // idle) takes it in; moving across at an angle of its wake of 0.3 (17°) starts taking it out,
+    // 0.7 (35°) has it out. Deep in it a rotor loses a tenth of its thrust on the mean, and its
+    // thrust shakes by half of its own and half of the descent's dynamic pressure on the disc
+    // (standard deviations), changing over some 50 ms. Estimated, to give what FPV pilots see falling with the
+    // throttle cut: it wobbles hard, some 10 to 25°, punches out with throttle and flies out of it.
+    wash: (onset: 0.5, full: 4.0, clear_from: 0.3, clear_to: 0.7, thrust_loss: 0.1, fluctuation: 0.5, buffet: 0.5, correlation_time: 0.05),
+    battery: (
+        cells: 4,
+        capacity_mah: 1300.0,
+        internal_resistance: 0.024,
+        // A cell's voltage with nothing drawn against the share of the charge used.
+        cell_voltage: [(0.0, 4.20), (0.05, 4.08), (0.15, 3.97), (0.3, 3.87), (0.5, 3.79), (0.7, 3.72), (0.85, 3.62), (0.93, 3.50), (1.0, 3.30)],
+    ),
+    controller: (
+        // "Betaflight" rates. Self-levelled only the yaw's are flown (the roll and pitch sticks ask
+        // for angles): 364°/s at full stick and soft in the middle (95°/s at half), as angle-mode
+        // pilots set them; the roll and pitch ones, 667°/s, are a freestyle tune's.
+        rates: (rc_rate: (1.0, 1.0, 1.0), super_rate: (0.7, 0.7, 0.45), expo: (0.0, 0.0, 0.3)),
+        // The rate loop, as angular accelerations: per rad/s of error, its integral, the gyro's
+        // change and the change of the rate asked for (roll, pitch, yaw).
+        p: (20.0, 20.0, 12.0),
+        i: (60.0, 60.0, 30.0),
+        d: (0.015, 0.015, 0.0),
+        feed_forward: (0.5, 0.5, 0.5),
+        i_limit: 80.0,
+        angle_max_deg: 55.0,
+        angle_gain: 7.0,
+    ),
+    start: (
+        // A start in the air hovers this high over the ground.
+        air_height: 15.0,
+    ),
+)

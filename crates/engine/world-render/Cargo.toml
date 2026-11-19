@@ -1,0 +1,20 @@
+[package]
+name = "world-render"
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+engine = { path = "../engine" }
+sim-core = { path = "../../sim/sim-core" }
+glam.workspace = true
+bytemuck.workspace = true
+
+[dev-dependencies]
+# Reading back the pictures the tests draw (`tests/effects.rs`); the engine already writes them with it.
+image = { version = "0.25.10", default-features = false, features = ["png"] }
+# The viewer's real places (`place=`, `at=`): the region is built before the world, as the game does.
+geodata = { path = "../../sim/geodata" }
+# Its counters of what the device made (`tests/effects.rs`: the first crash makes no pipeline);
+# the engine's own wgpu, with the feature that counts.
+wgpu = { version = "30.0.2", features = ["counters"] }

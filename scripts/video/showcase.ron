@@ -1,0 +1,119 @@
+// The showcase video's shots, in order: `flight --record <dir> --script scripts/video/showcase.ron`
+// (with --storyboard, a still of each), then `scripts/video/assemble.sh <dir> <out.mp4> --fade 0.15 <shots...>`.
+// See crates/games/flight/src/record.rs for what each field means.
+#![enable(implicit_some)]
+Script(
+    width: 1920,
+    height: 1080,
+    fps: 60,
+    supersample: 1,
+    subframes: 4,
+    shutter: 0.5,
+    shots: [
+        // Golden hour by the cumulus, the camera coming round from behind.
+        Shot(
+            name: "clouds",
+            args: "--place LEMH --offline --quality high --hour 18.5 --sky fair --air --aircraft c172",
+            seconds: 2.0,
+            start: Over(n: 0, e: 0, heading: 260, agl: 1500),
+            hold: true,
+            camera: [
+                Chase(t: 0.0, yaw: 18, pitch: 3, distance: 21, fov: 44),
+                Chase(t: 2.4, yaw: 62, pitch: 9, distance: 15, fov: 44),
+            ],
+        ),
+        // Low over the sea towards Menorca's south coast, the water mirroring the sky.
+        Shot(
+            name: "coast",
+            args: "--place LEMH --offline --quality high --hour 18.3 --sky fair --air --aircraft extra",
+            seconds: 1.7,
+            start: Over(n: -5000, e: -2000, heading: 0, agl: 40),
+            hold: true,
+            camera: [
+                Chase(t: 0.0, yaw: 24, pitch: 4, distance: 14, fov: 45),
+                Chase(t: 2.0, yaw: 8, pitch: 3, distance: 11, fov: 45),
+            ],
+        ),
+        // Son Bou: the long beach of Menorca's south coast, low over the water.
+        Shot(
+            name: "beach",
+            args: "--at 39.895,4.08 --offline --quality high --hour 12.0 --sky fair --air --aircraft extra",
+            seconds: 1.7,
+            start: Over(n: -350, e: -600, heading: 110, agl: 25),
+            hold: true,
+            camera: [
+                Chase(t: 0.0, yaw: 60, pitch: 8, distance: 22, fov: 45),
+                Chase(t: 2.0, yaw: 80, pitch: 10, distance: 18, fov: 45),
+            ],
+        ),
+        // A fast pass down the runway, past a camera beside it.
+        Shot(
+            name: "flyby",
+            args: "--place LEMH --offline --quality high --hour 17.0 --sky fair --aircraft extra",
+            seconds: 1.6,
+            start: Runway(back: 500, agl: 3),
+            hold: true,
+            before: 0.5,
+            still: 0.7,
+            // On the runway ahead, beside the centreline and above the aircraft: it comes down the
+            // runway with the runway behind it, and passes. (From lower than the aircraft, what is
+            // behind it is the grass beyond the far edge, and it seems to fly over that.)
+            camera: [
+                Fixed(t: 0.0, eye: (80, 13, 10), fov: 34),
+                Fixed(t: 1.8, eye: (84, 13, 10), fov: 34),
+            ],
+        ),
+        // Chamonix: the Mont Blanc massif, its snow and its glaciers, the aircraft small before it.
+        Shot(
+            name: "mountain",
+            args: "--at 45.92,6.87 --offline --quality high --hour 9.0 --sky fair --air --aircraft c172",
+            seconds: 1.8,
+            start: Over(n: 0, e: 0, heading: 210, agl: 700),
+            hold: true,
+            camera: [
+                Chase(t: 0.0, yaw: 20, pitch: -3, distance: 28, fov: 42),
+                Chase(t: 2.2, yaw: 9, pitch: -1, distance: 22, fov: 42),
+            ],
+        ),
+        // In the cockpit: the pilot's view, then in to the PFD, where a hand engages the GFC 700 (AP,
+        // HDG) and turns the heading bug 45° right; the horizon banks and the heading moves (the
+        // world twice and a half as fast from then on), and the eye goes to the right window, to the
+        // wing down and the ground turning, and back.
+        Shot(
+            name: "cockpit",
+            args: "--place LEMH --offline --quality high --hour 18.6 --sky fair --air --aircraft c172",
+            seconds: 7.6,
+            start: Over(n: 0, e: 0, heading: 250, agl: 1700),
+            fast: (5.3, 2.5),
+            hands: [
+                Press(t: 3.4, key: "ap"),
+                Press(t: 3.95, key: "hdg"),
+                Turn(t: 4.35, until: 5.35, knob: "hdg", clicks: 45),
+                Away(t: 5.8),
+            ],
+            camera: [
+                Cockpit(t: 0.0, spot: 0),
+                Cockpit(t: 1.8, spot: 0, fov: 60),
+                Cockpit(t: 2.9, spot: 3, fov: 46),
+                Cockpit(t: 6.0, spot: 3, fov: 44),
+                Cockpit(t: 6.7, spot: 0, yaw: 80, pitch: -15, fov: 64, shift: 0),
+                Cockpit(t: 7.0, spot: 0, yaw: 84, pitch: -16, fov: 64, shift: 0),
+                Cockpit(t: 7.6, spot: 0),
+            ],
+        ),
+        // The end: a dive into the runway, the fireball, the smoke and the pieces.
+        Shot(
+            name: "crash",
+            args: "--place LEMH --offline --quality high --hour 18.3 --sky fair --aircraft c172",
+            seconds: 2.2,
+            start: Runway(back: 400, agl: 60),
+            before: 0.2,
+            dive: (22, 30, 100),
+            still: 1.4,
+            camera: [
+                Fixed(t: 0.0, eye: (120, 22, 5), fov: 40),
+                Fixed(t: 2.2, eye: (112, 22, 5), fov: 40),
+            ],
+        ),
+    ],
+)

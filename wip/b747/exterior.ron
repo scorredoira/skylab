@@ -1,0 +1,43 @@
+// What moves of exterior.glb and how, its lights, its shadow: `crates/games/flight/src/models.rs`
+// says what each field is. Body axes (x forward, y right, z down), metres, radians. The model is
+// made from source/source.glb by source/import.py; the legs are in aircraft.ron's order: nose,
+// left wing, left body, right body, right wing, each bogie's two axles a wheel of its own.
+(
+    parts: [
+        (node: "airframe", inside: Hidden),
+        // The doors hanging open and the wells' linings, with the gear out; the doors closed, with it up.
+        (node: "gear_doors", moves: GearOut, inside: Hidden),
+        (node: "doors_closed", moves: GearUp, inside: Hidden),
+        (node: "leg_nose", moves: Fork(leg: 0), axis: (0.0, 0.0, 1.0)),
+        (node: "wheel_nose", moves: Wheel(leg: 0)),
+        (node: "leg_wing_left", moves: Fork(leg: 1)),
+        (node: "wheel_wing_left_front", moves: Wheel(leg: 1)),
+        (node: "wheel_wing_left_rear", moves: Wheel(leg: 1)),
+        (node: "leg_body_left", moves: Fork(leg: 2)),
+        (node: "wheel_body_left_front", moves: Wheel(leg: 2)),
+        (node: "wheel_body_left_rear", moves: Wheel(leg: 2)),
+        (node: "leg_body_right", moves: Fork(leg: 3)),
+        (node: "wheel_body_right_front", moves: Wheel(leg: 3)),
+        (node: "wheel_body_right_rear", moves: Wheel(leg: 3)),
+        (node: "leg_wing_right", moves: Fork(leg: 4)),
+        (node: "wheel_wing_right_front", moves: Wheel(leg: 4)),
+        (node: "wheel_wing_right_rear", moves: Wheel(leg: 4)),
+    ],
+    lights: [
+        (node: "light_left", kind: Navigation, color: (8.0, 0.3, 0.2)),
+        (node: "light_right", kind: Navigation, color: (0.2, 7.0, 1.5)),
+        (node: "light_tail", kind: Navigation, color: (7.0, 7.0, 6.5)),
+        (node: "beacon", kind: Beacon, color: (10.0, 0.4, 0.3)),
+        (node: "beacon_belly", kind: Beacon, color: (10.0, 0.4, 0.3)),
+        (node: "landing_light_left", kind: Landing, color: (9.0, 9.0, 8.0)),
+        (node: "landing_light_right", kind: Landing, color: (9.0, 9.0, 8.0)),
+    ],
+    // The wing (swept: about its middle), the fuselage, the tail cone, the tailplane; upright, the
+    // fuselage twice and the fin.
+    shadow: (
+        flat: ((-3.0, 7.0, 0.0, 29.9), (5.0, 26.6, 0.0, 3.25), (-28.0, 11.0, 0.0, 2.2), (-33.5, 3.5, 0.0, 11.0)),
+        flat_z: (0.3, 0.0, -1.0, -2.6),
+        upright: ((8.0, 23.6, -0.9, 3.8), (-22.0, 15.0, -1.2, 3.0), (-32.0, 6.0, -9.0, 5.0)),
+    ),
+    parked: None,
+)

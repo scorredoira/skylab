@@ -1,0 +1,22 @@
+[workspace]
+resolver = "2"
+members = ["crates/engine/engine", "crates/sim/sim-core", "crates/sim/geodata", "crates/engine/world-render", "crates/games/flight", "crates/games/drive", "crates/sim/sim-env", "crates/games/remote"]
+
+[workspace.package]
+edition = "2021"
+version = "0.1.0"
+license = "MIT"
+
+[workspace.dependencies]
+glam = "0.29"
+bytemuck = { version = "1", features = ["derive"] }
+
+[profile.dev]
+opt-level = 1
+
+# The simulation and the terrain generator are far too slow unoptimised.
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.release]
+opt-level = 3

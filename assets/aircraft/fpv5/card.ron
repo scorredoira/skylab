@@ -1,0 +1,10 @@
+// What the menu says of this quad beside its picture (picture.jpg, taken by scripts/menu-shots.sh).
+// The figures are those of multirotor.ron.
+(
+    class: "Freestyle quad · FPV",
+    tagline: "A 5-inch freestyle quadcopter seen through its own camera: it levels itself, for dives and gaps between the trees.",
+    good_for: "exploring low, gaps between the trees, the forest courses",
+    // 1 the easiest to 5 the hardest.
+    difficulty: 3,
+    facts: [("Thrust", "4 : 1"), ("Battery", "4S 1300"), ("Weight", "650 g"), ("Camera", "25° up")],
+)

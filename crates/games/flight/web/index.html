@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skylab</title>
+<link rel="icon" href="data:,">
+<style>
+  :root { color-scheme: dark; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #0d1117; color: #e6edf3;
+    font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
+  /* The game draws in all of the window; winit sizes the canvas's pixels to it. */
+  #game { display: block; width: 100vw; height: 100vh; outline: none; touch-action: none; }
+  #status { position: fixed; inset: 0; display: grid; place-content: center; padding: 16px; background: #0d1117; }
+  #status[hidden] { display: none; }
+  #status div { width: min(30rem, calc(100vw - 32px)); }
+  h1 { margin: 0 0 .75rem; font-size: 2rem; font-weight: 600; letter-spacing: .02em; }
+  #status-text { margin: 0 0 .75rem; min-height: 2.9em; color: #9da7b3; }
+  #status-bar { width: 100%; height: .5rem; accent-color: #58a6ff; }
+  a { color: #58a6ff; }
+</style>
+</head>
+<body>
+<canvas id="game" tabindex="0"></canvas>
+<div id="status">
+  <div>
+    <h1>Skylab</h1>
+    <p id="status-text">Loading…</p>
+    <progress id="status-bar" max="1"></progress>
+  </div>
+</div>
+<script type="module">
+  const say = (text, share) => {
+    document.getElementById("status-text").textContent = text;
+    const bar = document.getElementById("status-bar");
+    if (share === undefined) bar.removeAttribute("value"); else bar.value = share;
+  };
+  const stop = (text) => { say(text, 0); throw new Error(text); };
+
+  // WebGPU first: without it there is nothing to draw with.
+  const browsers = "Open it in Chrome (113 or later) or in Safari (26 or later).";
+  if (!navigator.gpu) stop("This browser has no WebGPU. " + browsers);
+  if (!await navigator.gpu.requestAdapter({ powerPreference: "high-performance" }))
+    stop("This browser has WebGPU, but finds no graphics card to use it with. " + browsers);
+  // The game's workers share its memory: the page must be served cross-origin isolated.
+  if (!crossOriginIsolated)
+    stop("The page must be served with the headers Cross-Origin-Opener-Policy: same-origin and " +
+         "Cross-Origin-Embedder-Policy: require-corp (scripts/serve-web.sh sets them).");
+  // The cache of real places (sw.js), in charge before the game's workers start, so that they use it.
+  try {
+    await navigator.serviceWorker.register("sw.js", { updateViaCache: "none" });
+    if (!navigator.serviceWorker.controller)
+      await new Promise((ready) => navigator.serviceWorker.addEventListener("controllerchange", ready, { once: true }));
+  } catch (error) {
+    console.warn("no cache of real places:", error);
+  }
+
+  // The module, with its progress: it is the largest file.
+  const response = await fetch("flight_bg.wasm");
+  if (!response.ok) stop(`Could not download the game (${response.status}).`);
+  const total = Number(response.headers.get("Content-Length")) || 0;
+  const reader = response.body.getReader();
+  const parts = [];
+  let received = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    parts.push(value);
+    received += value.length;
+    say(`Downloading the game: ${(received / 1e6).toFixed(0)} of ${(total / 1e6).toFixed(0)} MB`, total ? received / total : undefined);
+  }
+  const bytes = new Uint8Array(received);
+  let at = 0;
+  for (const part of parts) { bytes.set(part, at); at += part.length; }
+  say("Preparing the game…");
+  // The module's `main` (crates/games/flight/src/web.rs) goes on from here: the textures, then the game.
+  const { default: init } = await import("./flight.js");
+  await init({ module_or_path: bytes });
+</script>
+</body>
+</html>

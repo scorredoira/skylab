@@ -1,0 +1,10 @@
+// What the menu says of this aircraft beside its picture (picture.jpg, taken by scripts/menu-shots.sh).
+// The figures are those of aircraft.ron and of the handbook it follows.
+(
+    class: "Trainer · four seats",
+    tagline: "The aeroplane most pilots learn in: stable, forgiving, with a G1000 glass cockpit and an autopilot.",
+    good_for: "learning, circuits, touring, instruments",
+    // 1 the easiest to 5 the hardest.
+    difficulty: 1,
+    facts: [("Cruise", "120 kt"), ("Stall", "47 kt"), ("Weight", "1043 kg"), ("Engine", "160 hp")],
+)

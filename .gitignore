@@ -1,0 +1,17 @@
+target/
+.build/
+.DS_Store
+*.png
+.worktrees/
+.claude/
+# Screenshots are ignored above; the images of the game are not.
+!assets/**/*.png
+# The test fixtures of geodata, made up by its tests.
+!crates/sim/geodata/tests/fixtures/*.png
+# The Swift trainer: SwiftPM and Xcode build output, training runs.
+trainer/.build/
+trainer/.swiftpm/
+trainer/DerivedData/
+trainer/runs/
+*.fltmodel.tmp
+dist/

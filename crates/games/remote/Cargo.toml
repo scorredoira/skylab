@@ -1,0 +1,16 @@
+[package]
+name = "remote"
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+# The framing and the JSON are `sim-env`'s (its `PROTOCOL.md`): one way of writing a message for
+# the training environment and for a running game. Nothing else: sockets, threads and channels
+# come from the standard library.
+[dependencies]
+sim-env = { path = "../../sim/sim-env" }
+
+# The command-line client: one request to a running game per call.
+[[bin]]
+name = "skylab-ctl"
+path = "src/bin/skylab-ctl.rs"

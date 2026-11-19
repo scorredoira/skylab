@@ -1,0 +1,39 @@
+// A race course: `crates/sim/sim-core/src/course/file.rs` says what each field is. Positions are
+// metres in the frame of the runway of the aerodrome nearest `near` (the generated world of seed 1:
+// an airfield in a clearing of the forest, 9 km south of the home aerodrome), x along the runway
+// (to 192° true, `reversed`), y to its right; headings are degrees from x. Its hangars stand at
+// x 14 and 39, y -130, its parked aircraft along y -95, the forest beyond y -495 and y +450.
+(
+    name: "Pinewood Airfield",
+    description: "Down the hangar line, a slalom of flags, a dive from height, a gauntlet of hoops under the pines, a ladder on the fast straight and a hairpin home.",
+    place: Seed(1),
+    frame: Runway(near: (-6659.0, 11971.0), reversed: true),
+    start: (x: -150.0, y: -111.0, heading: 0.0),
+    laps: 2,
+    gates: [
+        // The start and finish, on the apron north of the hangars.
+        (kind: Arch, x: -120.0, y: -111.0, heading: 0.0),
+        // Between the hangars and the parked aircraft.
+        (kind: Square, x: 32.0, y: -111.0, heading: 0.0),
+        // A slalom of flags down the taxiway.
+        (kind: Flag, x: 100.0, y: -111.0, heading: 0.0, side: Right),
+        (kind: Flag, x: 150.0, y: -111.0, heading: 0.0, side: Left),
+        (kind: Flag, x: 200.0, y: -111.0, heading: 0.0, side: Right),
+        // Up, over and down through the dive gate.
+        (kind: Dive, x: 290.0, y: -300.0, heading: -100.0),
+        // Under the pines: into the forest's edge and a gauntlet of hoops through its gaps.
+        (kind: Square, x: 257.0, y: -466.0, heading: 235.0),
+        (kind: Round, x: 209.0, y: -534.0, heading: 215.0),
+        (kind: Round, x: 184.0, y: -541.0, heading: 182.0),
+        (kind: Round, x: 118.0, y: -527.0, heading: 171.0),
+        (kind: Round, x: 95.0, y: -525.0, heading: 187.0),
+        (kind: Round, x: 62.0, y: -537.0, heading: 184.0),
+        (kind: Round, x: 5.0, y: -524.0, heading: 130.0),
+        (kind: Square, x: 1.0, y: -486.0, heading: 105.0),
+        // The fast straight across the field: a hoop, and the ladder, through its top.
+        (kind: Round, x: -70.0, y: -410.0, heading: 128.0),
+        (kind: Ladder, x: -140.0, y: -335.0, heading: 132.0),
+        // The hairpin, round the flag on the left, and home through the arch.
+        (kind: Flag, x: -280.0, y: -180.0, heading: 90.0, side: Left),
+    ],
+)

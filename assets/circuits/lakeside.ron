@@ -1,0 +1,124 @@
+// A race circuit: `crates/sim/sim-core/src/circuit/file.rs` says what each field is. An original
+// layout (no real circuit's), in the generated world of seed 1 on the gentle slope between the
+// lake 9 km east of the home aerodrome and the sea: the pits and the main straight run north along
+// the lake's eastern shore, the circuit drops some 30 m through the woods to a hairpin by the coast
+// and climbs back through a chicane and a run of esses. Points are metres north and east of `origin`.
+(
+    name: "Lakeside Park",
+    description: "A kilometre of straight by the lake, a fast right into the woods, sweepers down to a hairpin, a chicane, the esses and a long final corner onto the straight.",
+    place: Seed(1),
+    origin: (1000.0, 21900.0),
+    width: 12.0,
+    start: 447.0,
+    laps: 3,
+    sides: (runoff: Grass, runoff_width: 12.0, barrier: Armco, kerbs: Auto),
+    points: [
+        // The main straight, north, the pits on its left.
+        (n: -602.0, e: -516.0, left: (runoff: Asphalt, runoff_width: 4.0, barrier: Wall, pit: true), right: (runoff: Grass, runoff_width: 14.0)),
+        (n: -172.0, e: -516.0),
+        (n: 258.0, e: -514.3, left: (runoff: Gravel, runoff_width: 32.0, barrier: Tyres, pit: false)),
+        // Turn 1: a 90° right into the woods.
+        (n: 378.4, e: -488.5),
+        (n: 434.3, e: -404.2),
+        (n: 451.5, e: -258.0, left: (runoff: Grass, runoff_width: 14.0, barrier: Armco)),
+        // A fast left and a long right, falling away to the east.
+        (n: 516.0, e: -103.2, right: (runoff: Gravel, runoff_width: 24.0, barrier: Tyres)),
+        (n: 602.0, e: 25.8),
+        (n: 619.2, e: 172.0, right: (runoff: Grass, runoff_width: 14.0, barrier: Armco), left: (runoff: Gravel, runoff_width: 26.0, barrier: Tyres)),
+        (n: 550.4, e: 326.8),
+        (n: 430.0, e: 447.2, left: (runoff: Grass, runoff_width: 14.0, barrier: Armco)),
+        (n: 326.8, e: 602.0),
+        // Braking downhill for the hairpin: a big gravel trap beyond it.
+        (n: 206.4, e: 713.8),
+        (n: 107.5, e: 795.5, left: (runoff: Gravel, runoff_width: 36.0, barrier: Tyres)),
+        (n: 87.7, e: 849.7),
+        (n: 65.4, e: 878.9),
+        (n: 40.4, e: 860.0),
+        (n: 38.7, e: 799.8),
+        (n: 47.3, e: 688.0, left: (runoff: Grass, runoff_width: 14.0, barrier: Armco)),
+        // The chicane, with asphalt run-off.
+        (n: 51.6, e: 584.8, both: (runoff: Asphalt, runoff_width: 12.0, kerbs: Always)),
+        (n: 67.1, e: 550.4),
+        (n: 44.7, e: 514.3),
+        (n: 49.9, e: 473.0, both: (runoff: Grass, runoff_width: 14.0, kerbs: Auto)),
+        // Climbing back west through the esses.
+        (n: 34.4, e: 326.8),
+        (n: -51.6, e: 189.2, right: (runoff: Gravel, runoff_width: 22.0, barrier: Tyres)),
+        (n: -189.2, e: 129.0, right: (runoff: Grass, runoff_width: 14.0, barrier: Armco)),
+        (n: -326.8, e: 141.9, left: (runoff: Gravel, runoff_width: 22.0, barrier: Tyres)),
+        (n: -430.0, e: 51.6, left: (runoff: Grass, runoff_width: 14.0, barrier: Armco)),
+        (n: -533.2, e: -103.2),
+        // The final corner: a long right onto the straight, asphalt beyond it.
+        (n: -653.6, e: -283.8, left: (runoff: Asphalt, runoff_width: 22.0, barrier: Tyres)),
+        (n: -705.2, e: -412.8),
+        (n: -679.4, e: -490.2),
+    ],
+    props: [
+        (kind: Pits, along: 283.8, side: Left, length: 360.0),
+        (kind: Gantry, along: 447.2, side: Left),
+        (kind: Grandstand, along: 369.8, side: Right, length: 120.0, offset: 4.0),
+        (kind: Grandstand, along: 516.0, side: Right, length: 120.0, offset: 4.0),
+        (kind: Grandstand, along: 2941.2, side: Left, length: 80.0, offset: 30.0),
+        (kind: Marshal, along: 903.0, side: Left, offset: 2.0),
+        (kind: Marshal, along: 1462.0, side: Right, offset: 2.0),
+        (kind: Marshal, along: 1978.0, side: Left, offset: 2.0),
+        (kind: Marshal, along: 2494.0, side: Left, offset: 2.0),
+        (kind: Marshal, along: 3096.0, side: Right, offset: 2.0),
+        (kind: Marshal, along: 3698.0, side: Left, offset: 2.0),
+        (kind: Bridge, along: 1290.0, side: Left),
+        // The floodlights, each at the end of the circuit's ground on its side (`offset` further).
+        // The main straight: a row along its right, one of them between the two grandstands at
+        // the start line, and three tall ones behind the pits.
+        (kind: Floodlight, along: 30.0, side: Right),
+        (kind: Floodlight, along: 150.0, side: Right),
+        (kind: Floodlight, along: 265.0, side: Right),
+        (kind: Floodlight, along: 443.0, side: Right, offset: 3.0),
+        (kind: Floodlight, along: 600.0, side: Right),
+        (kind: Floodlight, along: 715.0, side: Right),
+        (kind: Floodlight, along: 830.0, side: Right),
+        (kind: Floodlight, along: 120.0, side: Left, offset: 18.0),
+        (kind: Floodlight, along: 285.0, side: Left, offset: 18.0),
+        (kind: Floodlight, along: 450.0, side: Left, offset: 18.0),
+        // Turn 1: round the outside, behind the gravel.
+        (kind: Floodlight, along: 915.0, side: Left),
+        (kind: Floodlight, along: 1000.0, side: Left),
+        (kind: Floodlight, along: 1085.0, side: Left),
+        // The fast left and the long right down to the hairpin: on the outside of each.
+        (kind: Floodlight, along: 1190.0, side: Right),
+        (kind: Floodlight, along: 1310.0, side: Left),
+        (kind: Floodlight, along: 1400.0, side: Right),
+        (kind: Floodlight, along: 1500.0, side: Left),
+        (kind: Floodlight, along: 1585.0, side: Left),
+        (kind: Floodlight, along: 1670.0, side: Left),
+        (kind: Floodlight, along: 1755.0, side: Left),
+        (kind: Floodlight, along: 1870.0, side: Left),
+        (kind: Floodlight, along: 1990.0, side: Right),
+        (kind: Floodlight, along: 2075.0, side: Right),
+        (kind: Floodlight, along: 2195.0, side: Left),
+        (kind: Floodlight, along: 2315.0, side: Right),
+        (kind: Floodlight, along: 2405.0, side: Left),
+        (kind: Floodlight, along: 2490.0, side: Right),
+        // The hairpin, behind its gravel trap, and its exit.
+        (kind: Floodlight, along: 2575.0, side: Left),
+        (kind: Floodlight, along: 2660.0, side: Left),
+        (kind: Floodlight, along: 2780.0, side: Right),
+        // The chicane and the esses.
+        (kind: Floodlight, along: 2955.0, side: Right),
+        (kind: Floodlight, along: 3040.0, side: Right),
+        (kind: Floodlight, along: 3150.0, side: Right),
+        (kind: Floodlight, along: 3260.0, side: Right),
+        (kind: Floodlight, along: 3370.0, side: Right),
+        (kind: Floodlight, along: 3475.0, side: Right),
+        (kind: Floodlight, along: 3560.0, side: Right),
+        (kind: Floodlight, along: 3645.0, side: Left),
+        (kind: Floodlight, along: 3730.0, side: Left),
+        (kind: Floodlight, along: 3815.0, side: Left),
+        (kind: Floodlight, along: 3935.0, side: Right),
+        (kind: Floodlight, along: 4055.0, side: Left),
+        // The final corner, round its outside.
+        (kind: Floodlight, along: 4175.0, side: Right),
+        (kind: Floodlight, along: 4270.0, side: Left),
+        (kind: Floodlight, along: 4355.0, side: Left),
+        (kind: Floodlight, along: 4440.0, side: Left),
+    ],
+)

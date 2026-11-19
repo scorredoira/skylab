@@ -1,0 +1,148 @@
+// The kinds of race gate: their opening (what counts as flown through) and their frame (the tubes
+// a quad runs into), in the gate's own axes: x the way through it (its heading), y to the right,
+// z up, metres from its foot, the ground under its middle. A course places them
+// (assets/courses/<key>.ron) and may scale them; `sim_core::course` reads this file, and
+// `crates/games/flight/examples/gate_models.rs` builds `gates.glb` from the same frames, so what is
+// drawn is what is hit. Tubes are bars of `tube` radius between the points given: `Rect` four along
+// the edges of an upright rectangle across x, `Ring` a circle in that plane, `FlatRect` a level
+// rectangle, `Bar` one tube.
+(
+    shapes: [
+        // The start and finish: an inflatable arch, 8 m across and 4.8 m high inside, the checkered
+        // banner on top.
+        (
+            kind: Arch,
+            name: "start and finish arch",
+            opening: Rect(middle: (0.0, 2.6), half: (4.0, 2.4)),
+            tube: 0.35,
+            parts: [
+                Bar(from: (0.0, -4.35, 0.0), to: (0.0, -4.35, 5.35)),
+                Bar(from: (0.0, 4.35, 0.0), to: (0.0, 4.35, 5.35)),
+                Bar(from: (0.0, -4.35, 5.35), to: (0.0, 4.35, 5.35)),
+            ],
+            number: (0.0, 0.0, 6.4),
+        ),
+        // The common gate: a square of 3 m inside on two short legs, a metre off the ground.
+        (
+            kind: Square,
+            name: "gate",
+            opening: Rect(middle: (0.0, 2.5), half: (1.5, 1.5)),
+            tube: 0.06,
+            parts: [
+                Rect(middle: (0.0, 2.5), half: (1.56, 1.56)),
+                Bar(from: (0.0, -1.56, 0.0), to: (0.0, -1.56, 0.94)),
+                Bar(from: (0.0, 1.56, 0.0), to: (0.0, 1.56, 0.94)),
+                Bar(from: (-0.6, -1.56, 0.06), to: (0.6, -1.56, 0.06)),
+                Bar(from: (-0.6, 1.56, 0.06), to: (0.6, 1.56, 0.06)),
+            ],
+            number: (0.0, 0.0, 4.45),
+        ),
+        // A hoop 3.2 m across on a post.
+        (
+            kind: Round,
+            name: "hoop",
+            opening: Circle(middle: (0.0, 2.6), radius: 1.6),
+            tube: 0.06,
+            parts: [
+                Ring(middle: (0.0, 2.6), radius: 1.66, segments: 24),
+                Bar(from: (0.0, 0.0, 0.0), to: (0.0, 0.0, 0.94)),
+                Bar(from: (-0.7, 0.0, 0.06), to: (0.7, 0.0, 0.06)),
+            ],
+            number: (0.0, 0.0, 4.75),
+        ),
+        // Two gates stacked: only the upper one counts, 4.4 to 7.4 m up.
+        (
+            kind: Ladder,
+            name: "ladder",
+            opening: Rect(middle: (0.0, 5.9), half: (1.5, 1.5)),
+            tube: 0.06,
+            parts: [
+                Rect(middle: (0.0, 2.5), half: (1.56, 1.56)),
+                Rect(middle: (0.0, 5.9), half: (1.56, 1.56)),
+                Bar(from: (0.0, -1.56, 4.06), to: (0.0, -1.56, 4.34)),
+                Bar(from: (0.0, 1.56, 4.06), to: (0.0, 1.56, 4.34)),
+                Bar(from: (0.0, -1.56, 0.0), to: (0.0, -1.56, 0.94)),
+                Bar(from: (0.0, 1.56, 0.0), to: (0.0, 1.56, 0.94)),
+                Bar(from: (-0.8, -1.56, 0.06), to: (0.8, -1.56, 0.06)),
+                Bar(from: (-0.8, 1.56, 0.06), to: (0.8, 1.56, 0.06)),
+            ],
+            number: (0.0, 0.0, 7.85),
+        ),
+        // A feather flag on a pole, flown round on the side the course says: what counts is
+        // crossing the line from the pole out 25 m to the other side, up to 15 m high.
+        (
+            kind: Flag,
+            name: "flag",
+            opening: Beside(reach: 25.0, top: 15.0),
+            tube: 0.05,
+            parts: [
+                Bar(from: (0.0, 0.0, 0.0), to: (0.0, 0.0, 4.3)),
+            ],
+            number: (0.0, 0.0, 4.75),
+        ),
+        // A level gate 4 m square, 7 m up on four legs, flown down through: the dive.
+        (
+            kind: Dive,
+            name: "dive gate",
+            opening: Flat(z: 7.0, half: (2.0, 2.0)),
+            tube: 0.07,
+            parts: [
+                FlatRect(z: 7.0, half: (2.07, 2.07)),
+                Bar(from: (-2.07, -2.07, 0.0), to: (-2.07, -2.07, 6.93)),
+                Bar(from: (-2.07, 2.07, 0.0), to: (-2.07, 2.07, 6.93)),
+                Bar(from: (2.07, -2.07, 0.0), to: (2.07, -2.07, 6.93)),
+                Bar(from: (2.07, 2.07, 0.0), to: (2.07, 2.07, 6.93)),
+            ],
+            number: (-2.07, 0.0, 7.75),
+        ),
+        // A fallen log across the trail, resting 3 m up on two stumps 4.6 m apart: flown under, the
+        // opening between the stumps from 0.45 m over the ground to the log's underside.
+        (
+            kind: Log,
+            name: "log",
+            opening: Rect(middle: (0.0, 1.6), half: (2.05, 1.15)),
+            tube: 0.22,
+            parts: [
+                Bar(from: (0.0, -2.3, 0.0), to: (0.0, -2.3, 2.8)),
+                Bar(from: (0.0, 2.3, 0.0), to: (0.0, 2.3, 2.8)),
+                Bar(from: (0.0, -3.4, 3.0), to: (0.0, 3.3, 3.02)),
+            ],
+            number: (0.0, 0.0, 3.75),
+        ),
+        // A hoop 3.2 m across high on a pole, its middle 7.4 m up: climbed to through a gap in the
+        // canopy.
+        (
+            kind: High,
+            name: "high hoop",
+            opening: Circle(middle: (0.0, 7.4), radius: 1.6),
+            tube: 0.06,
+            parts: [
+                Ring(middle: (0.0, 7.4), radius: 1.66, segments: 24),
+                Bar(from: (0.0, 0.0, 0.0), to: (0.0, 0.0, 5.74)),
+                Bar(from: (-0.9, 0.0, 0.06), to: (0.9, 0.0, 0.06)),
+                Bar(from: (0.0, -0.9, 0.06), to: (0.0, 0.9, 0.06)),
+            ],
+            number: (0.0, 0.0, 9.55),
+        ),
+        // A hoop 3.2 m across hung on straps from a beam between two posts 5.2 m apart, 6 m up:
+        // its middle 3.4 m over the ground.
+        (
+            kind: Hanging,
+            name: "hanging hoop",
+            opening: Circle(middle: (0.0, 3.4), radius: 1.6),
+            tube: 0.06,
+            parts: [
+                Ring(middle: (0.0, 3.4), radius: 1.66, segments: 24),
+                Bar(from: (0.0, -2.6, 0.0), to: (0.0, -2.6, 6.0)),
+                Bar(from: (0.0, 2.6, 0.0), to: (0.0, 2.6, 6.0)),
+                Bar(from: (0.0, -2.6, 6.0), to: (0.0, 2.6, 6.0)),
+                Bar(from: (0.0, 0.0, 5.06), to: (0.0, 0.0, 6.0)),
+                Bar(from: (0.0, -1.17, 4.57), to: (0.0, -1.7, 6.0)),
+                Bar(from: (0.0, 1.17, 4.57), to: (0.0, 1.7, 6.0)),
+                Bar(from: (-0.8, -2.6, 0.06), to: (0.8, -2.6, 0.06)),
+                Bar(from: (-0.8, 2.6, 0.06), to: (0.8, 2.6, 0.06)),
+            ],
+            number: (0.0, 0.0, 6.55),
+        ),
+    ],
+)

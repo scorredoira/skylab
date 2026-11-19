@@ -1,0 +1,66 @@
+// The GT's sound, made of recordings (CREDITS.md in this folder says whose, under which licence,
+// and what was done to them): `crates/games/drive/src/audio.rs` reads it and mixes it.
+//
+// The engine: loops of one engine recorded on a chassis dynamometer at steady revs, on load (full
+// throttle) and off load (free revving), by two microphones: `Exhaust` a foot behind the tailpipe,
+// `Bay` taped to the radiator support in the engine bay. Each loop is a whole number of engine
+// cycles at one pitch; `rpm` is the speed it was measured at (its firing frequency x 120 /
+// cylinders). The mixer plays the two loops nearest the revs, each resampled to the exact revs,
+// and blends on and off load by the engine's torque.
+(
+    engine: (
+        // The recorded engine: a Mercedes-Benz 190E 2.3-16V (a four-cylinder, four-stroke).
+        cylinders: 4,
+        layers: [
+            (file: "engine_engine_off_1028.wav", mic: Bay, load: Off, rpm: 1027.7),
+            (file: "engine_engine_off_2430.wav", mic: Bay, load: Off, rpm: 2430.3),
+            (file: "engine_engine_off_3400.wav", mic: Bay, load: Off, rpm: 3400.1),
+            (file: "engine_engine_off_4400.wav", mic: Bay, load: Off, rpm: 4400.1),
+            (file: "engine_engine_off_5300.wav", mic: Bay, load: Off, rpm: 5300.0),
+            (file: "engine_engine_off_6296.wav", mic: Bay, load: Off, rpm: 6296.1),
+            (file: "engine_engine_off_6650.wav", mic: Bay, load: Off, rpm: 6650.1),
+            (file: "engine_engine_on_1289.wav", mic: Bay, load: On, rpm: 1289.1),
+            (file: "engine_engine_on_2556.wav", mic: Bay, load: On, rpm: 2556.4),
+            (file: "engine_engine_on_3400.wav", mic: Bay, load: On, rpm: 3400.0),
+            (file: "engine_engine_on_4300.wav", mic: Bay, load: On, rpm: 4300.0),
+            (file: "engine_engine_on_5200.wav", mic: Bay, load: On, rpm: 5200.0),
+            (file: "engine_engine_on_6207.wav", mic: Bay, load: On, rpm: 6206.6),
+            (file: "engine_engine_on_6950.wav", mic: Bay, load: On, rpm: 6950.1),
+            (file: "engine_exhaust_off_1016.wav", mic: Exhaust, load: Off, rpm: 1015.6),
+            (file: "engine_exhaust_off_1600.wav", mic: Exhaust, load: Off, rpm: 1600.0),
+            (file: "engine_exhaust_off_2430.wav", mic: Exhaust, load: Off, rpm: 2430.3),
+            (file: "engine_exhaust_off_3400.wav", mic: Exhaust, load: Off, rpm: 3400.0),
+            (file: "engine_exhaust_off_4400.wav", mic: Exhaust, load: Off, rpm: 4400.0),
+            (file: "engine_exhaust_off_5300.wav", mic: Exhaust, load: Off, rpm: 5299.9),
+            (file: "engine_exhaust_off_6294.wav", mic: Exhaust, load: Off, rpm: 6294.0),
+            (file: "engine_exhaust_off_6900.wav", mic: Exhaust, load: Off, rpm: 6899.9),
+            (file: "engine_exhaust_on_1289.wav", mic: Exhaust, load: On, rpm: 1288.9),
+            (file: "engine_exhaust_on_1800.wav", mic: Exhaust, load: On, rpm: 1800.0),
+            (file: "engine_exhaust_on_2556.wav", mic: Exhaust, load: On, rpm: 2556.4),
+            (file: "engine_exhaust_on_3400.wav", mic: Exhaust, load: On, rpm: 3400.0),
+            (file: "engine_exhaust_on_4300.wav", mic: Exhaust, load: On, rpm: 4300.1),
+            (file: "engine_exhaust_on_5200.wav", mic: Exhaust, load: On, rpm: 5199.8),
+            (file: "engine_exhaust_on_6208.wav", mic: Exhaust, load: On, rpm: 6207.7),
+            (file: "engine_exhaust_on_6700.wav", mic: Exhaust, load: On, rpm: 6700.0),
+        ],
+        // Loudness against revs (between the points, straight lines): on load (full throttle)
+        // and off load (closed throttle, the engine braking).
+        on_level: [(800.0, 0.25), (3000.0, 0.5), (5500.0, 0.8), (7500.0, 1.0)],
+        off_level: [(800.0, 0.2), (3000.0, 0.25), (7500.0, 0.36)],
+    ),
+    // The starter turning the engine over until it catches (at `catches` seconds), at the start.
+    starter: (file: "starter.wav", gain: 0.9, catches: 0.75),
+    // Tyres: squealing as they slide sideways; the harsher scream of a wheel spinning or locked.
+    squeal: (file: "squeal.wav", gain: 0.55),
+    skid: (file: "skid.wav", gain: 0.5),
+    // Rolling on asphalt, the rumble of a kerb's ridges (its beat in the recording, Hz), gravel
+    // (and, played slower and duller, grass and earth).
+    road: (file: "road.wav", gain: 0.32),
+    kerb: (file: "kerb.wav", gain: 0.7, beat_hz: 97.771),
+    gravel: (file: "gravel.wav", gain: 0.55),
+    // The wind past the body.
+    wind: (file: "wind.wav", gain: 0.5),
+    // A knock against a wall or another car, and the body scraping along one.
+    impact: (file: "impact.wav", gain: 1.0),
+    scrape: (file: "scrape.wav", gain: 0.45),
+)

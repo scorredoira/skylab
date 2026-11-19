@@ -1,0 +1,10 @@
+// What the menu says of this aircraft beside its picture (picture.jpg, taken by scripts/menu-shots.sh).
+// The figures are those of aircraft.ron.
+(
+    class: "Airliner · four engines",
+    tagline: "The first jumbo jet: 256 tonnes on eighteen wheels, four turbofans that take eight seconds to answer, and Mach 0.85 up high.",
+    good_for: "long flights up high, big runways, engine failures",
+    // 1 the easiest to 5 the hardest.
+    difficulty: 4,
+    facts: [("Cruise", "Mach 0.84"), ("Approach", "146 kt"), ("Weight", "256 t"), ("Thrust", "4 × 193 kN")],
+)

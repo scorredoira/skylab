@@ -1,0 +1,14 @@
+[package]
+name = "sim-env"
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+# The only dependency is the simulation. Threads, sockets and the little JSON the protocol needs
+# come from the standard library (`src/json.rs` is hand-written: no serde).
+[dependencies]
+sim-core = { path = "../sim-core" }
+
+[[bin]]
+name = "flight-env"
+path = "src/main.rs"

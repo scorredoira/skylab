@@ -1,0 +1,37 @@
+[package]
+name = "flight"
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+# The program is Skylab: `target/release/skylab`. The package keeps its name (`cargo run -p flight`).
+[[bin]]
+name = "skylab"
+path = "src/main.rs"
+
+[dependencies]
+engine = { path = "../../engine/engine" }
+sim-core = { path = "../../sim/sim-core" }
+world-render = { path = "../../engine/world-render" }
+# Aircraft flown by trained models (`--model`): `ModelPilot` and the referee of its task.
+sim-env = { path = "../../sim/sim-env" }
+glam = { workspace = true, features = ["serde"] }
+bytemuck.workspace = true
+# The aircraft's looks (`models.rs`, `cockpit/file.rs`) and the recordings' scripts (`record.rs`), read from RON.
+serde = { version = "1.0.228", features = ["derive"] }
+ron = "0.12.2"
+# Real places (`--place`, `--at`, the settings): the regions are downloaded and built by it.
+geodata = { path = "../../sim/geodata" }
+# The place picker's map: the areas of the vector tiles (outer rings with holes, any shape) into
+# triangles, once per tile. Pure Rust, small, also on the web.
+earcutr = "0.5.0"
+
+# The web: the start, which waits for the game's files without blocking the page (`web.rs`).
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen-futures = "0.4.80"
+
+# Recordings (`--record`, `record.rs`): the frames, written as PNG.
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+image = { version = "0.25.10", default-features = false, features = ["png"] }
+# The game flown by another program (`--remote`, `remote.rs`): the socket and its messages.
+remote = { path = "../remote" }

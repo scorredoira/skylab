@@ -1,0 +1,12 @@
+[package]
+name = "sim-core"
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+glam.workspace = true
+# Reading the types of aircraft from their files (`aircraft::file`): RON, close to the Rust structs
+# they become, with comments; serde derives the readers.
+serde = { version = "1.0.228", features = ["derive"] }
+ron = "0.12.2"

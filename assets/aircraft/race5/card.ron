@@ -1,0 +1,10 @@
+// What the menu says of this quad beside its picture (picture.jpg, taken by scripts/menu-shots.sh).
+// The figures are those of multirotor.ron.
+(
+    class: "Racing quad · FPV",
+    tagline: "A 5-inch racer as raced today: 13 times its weight in thrust and 170 km/h between the gates.",
+    good_for: "the race courses, against the AI",
+    // 1 the easiest to 5 the hardest.
+    difficulty: 5,
+    facts: [("Top speed", "170 km/h"), ("Thrust", "13.5 : 1"), ("Weight", "500 g"), ("Camera", "40° up")],
+)

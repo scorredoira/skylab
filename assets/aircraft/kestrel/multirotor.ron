@@ -1,0 +1,174 @@
+// The Kestrel: an invented tilt-rotor gunship of a film's kind. A cabin for two and a hold behind
+// it, two turboshafts on the roof, and out on a pylon each side a wide ring with two rotors in it,
+// one over the other turning against each other, that tilts forward. Skids, small stub wings, a
+// tailplane with an elevator and a fin. 4.8 t.
+//
+// It is not a real machine, so its numbers have no maker's sheet; they are chosen to hold
+// together by the physics the model has, beside those of the machines nearest it:
+// - Four rotors of 4 m carrying 4.8 t: 11.8 kN each in the hover, 0.94 kN/m² of disc (a light
+//   helicopter's is 0.3 to 0.5, a tilt-rotor's 1 and more). Momentum theory gives each an induced
+//   velocity of 19.5 m/s there and an ideal 230 kW; with tip losses (1.15) and the blades'
+//   profile power (55 kW), 320 kW: 1.28 MW in all.
+// - Two turboshafts of 1150 kW (1540 shp, the class of a ten-seat twin helicopter's): hovering
+//   takes 56 % of them, and all of them lift 1.57 times its weight.
+// - Tips at 210 m/s (105 rad/s, 1000 rpm), held by the engines' governor.
+// - 720 kg of fuel at 0.30 kg per kW h: an hour and twenty-five minutes of hover.
+//
+// The format is crates/sim/sim-core/README.md's "Multirotor files". Units are SI (m, kg, N, s,
+// radians) unless the name says otherwise: _deg degrees, _rpm turns a minute, _kw kilowatts.
+// Positions are body axes (x forward, y right, z down) from the centre of gravity.
+(
+    key: "kestrel",
+    name: "Kestrel tilt-rotor",
+    aliases: ["tiltrotor", "gunship", "copter"],
+    // The model the game draws and its cockpit (the view from it is the cockpit's pilot's seat;
+    // the camera is what a view without a cockpit would be).
+    visual: (model: "kestrel", cockpit: "kestrel", camera: (position: (2.62, 0.42, 0.7), uptilt_deg: 0.0, fov_deg: 100.0)),
+
+    mass: (
+        mass: 4800.0,
+        // Estimated: the two rings with their rotors and gearboxes (some 450 kg each) 3.9 m out,
+        // the engines and the tanks over the hold, a cabin and tail boom 10 m long.
+        inertia: (19000.0, 24000.0, 38000.0),
+    ),
+
+    frame: (
+        // Estimated: drag coefficient times the area seen from ahead (the cabin's 4.5 m² at 0.4,
+        // the rings edge on, the skids, the stub wings' stores), the side and above (near 1 on
+        // the whole of each).
+        drag_area: (3.2, 10.0, 24.0),
+        rotational_damping: 2500.0,
+        // The skids' four ends (what it stands on), the nose and the tail's end, the belly, the
+        // engines' top, the rings' rims (as they are upright), the fin's top and the tailplane's
+        // tips.
+        contacts: [
+            (1.9, -1.15, 2.45), (1.9, 1.15, 2.45), (-1.5, -1.15, 2.45), (-1.5, 1.15, 2.45),
+            (5.0, 0.0, 1.5), (-5.2, 0.0, 0.3), (0.0, 0.0, 2.1), (-0.5, 0.0, -1.0),
+            (0.0, -6.1, -0.45), (0.0, 6.1, -0.45), (0.0, -3.9, -0.95), (0.0, 3.9, -0.95),
+            (2.2, -3.9, -0.45), (2.2, 3.9, -0.45), (-2.2, -3.9, -0.45), (-2.2, 3.9, -0.45),
+            (-5.3, 0.0, -1.7), (-4.9, -1.7, -0.4), (-4.9, 1.7, -0.4),
+        ],
+        // Per point: the four skid ends carry its weight 2.4 cm down, damped at 0.8 of critical.
+        contact_spring: 500000.0,
+        contact_damping: 40000.0,
+        friction: 0.6,
+        // What its skids and frame take, m/s: a hard landing, not a fall.
+        crash_speed: 5.0,
+        solid: [((-5.2, -1.0, -1.0), (5.0, 1.0, 2.45)), ((-2.2, -6.1, -0.95), (2.2, 6.1, 0.0))],
+        // The frame as balls (centre, radius): the cabin and the boom along the middle, the tail,
+        // and each ring: its hub and six round its rim.
+        parts: [
+            ((3.6, 0.0, 1.2), 0.9), ((1.8, 0.0, 0.9), 1.2), ((0.0, 0.0, 0.7), 1.3), ((-1.8, 0.0, 0.5), 1.0), ((-3.4, 0.0, 0.2), 0.6),
+            ((-4.9, 0.0, -0.6), 0.8),
+            ((0.0, -3.9, -0.5), 0.5), ((2.1, -3.9, -0.45), 0.4), ((1.05, -5.72, -0.45), 0.4), ((-1.05, -5.72, -0.45), 0.4), ((-2.1, -3.9, -0.45), 0.4), ((-1.05, -2.08, -0.45), 0.4), ((1.05, -2.08, -0.45), 0.4),
+            ((0.0, 3.9, -0.5), 0.5), ((2.1, 3.9, -0.45), 0.4), ((1.05, 5.72, -0.45), 0.4), ((-1.05, 5.72, -0.45), 0.4), ((-2.1, 3.9, -0.45), 0.4), ((-1.05, 2.08, -0.45), 0.4), ((1.05, 2.08, -0.45), 0.4),
+        ],
+        // Metal on things: it stays where it hits.
+        restitution: 0.1,
+    ),
+
+    // Left upper, left lower, right upper, right lower: in each ring the two turn against each
+    // other, and the rings mirror each other. The hubs are given with the nacelles upright.
+    motors: [
+        (position: (0.0, -3.9, -0.65), spin: Clockwise),
+        (position: (0.0, -3.9, -0.35), spin: CounterClockwise),
+        (position: (0.0, 3.9, -0.65), spin: CounterClockwise),
+        (position: (0.0, 3.9, -0.35), spin: Clockwise),
+    ],
+    propeller: (
+        diameter: 4.0,
+        // Unused with turbines (the blades' pitch is the collective's).
+        pitch: 4.0,
+        // The thrust a unit of pitch gives at the governed speed with no air through the disc: 26 kN.
+        thrust_coefficient: 2.358,
+        // Unused with turbines (the power is momentum theory's).
+        torque_coefficient: 1.0,
+        // Estimated: the drag of a disc moving edge on, some 3 % of its thrust at 30 m/s.
+        edgewise_drag: 0.11,
+        // A blade meeting something solid: a tip chipped at a walk, the rotor gone faster.
+        strike: (thickness: 0.2, graze_speed: 1.0, chip_depth: 0.06, stub: 0.2, shake: 1.0),
+    ),
+    // Its own wash: sinking from half to four times as fast as a rotor pushes the air down (some
+    // 20 m/s in the hover) takes it in, moving across takes it out; deep in it a rotor loses a
+    // tenth of its thrust and shakes, slowly for its size. Estimated.
+    wash: (onset: 0.5, full: 4.0, clear_from: 0.3, clear_to: 0.7, thrust_loss: 0.1, fluctuation: 0.15, buffet: 0.2, correlation_time: 0.4),
+    turbine: (
+        engines: 2,
+        power_kw: 1150.0,
+        rotor_rpm: 1003.0,
+        // The collective lever: from flat blades to their full pitch. It hovers at 0.57, the
+        // lever in the middle: 0.45 for its weight and 0.12 for the 19.5 m/s its rotors push
+        // through themselves.
+        pitch: (0.0, 1.1),
+        // The air through a disc at 84 m/s takes half a unit of pitch: flying forward the lever
+        // goes up with the speed, as a propeller's pitch does.
+        inflow_length: 1.6,
+        induced_factor: 1.15,
+        profile_power_kw: 55.0,
+        // Four rotors of four 18 kg blades (96 kg m² each), the gearboxes and the power turbines.
+        inertia: 520.0,
+        // The gas generators follow the governor in a second; lighting them takes five.
+        spool_time: 1.0,
+        start_time: 5.0,
+        fuel: 720.0,
+        fuel_per_kwh: 0.30,
+        idle_flow_per_hour: 60.0,
+    ),
+    controller: (
+        // The sticks' rates at their ends: 60°/s of roll, 40 of pitch, 60 of yaw.
+        rates: (rc_rate: (0.3, 0.2, 0.3), super_rate: (0.0, 0.0, 0.0), expo: (0.0, 0.0, 0.0)),
+        // The rate loop, as angular accelerations (roll, pitch, yaw): gentle, for 4.8 t.
+        p: (5.0, 3.0, 2.5),
+        i: (3.0, 4.0, 0.5),
+        d: (0.0, 0.0, 0.0),
+        feed_forward: (0.0, 0.0, 0.0),
+        i_limit: 5.0,
+        // Self-levelled (the help a pilot can ask for): to 35°.
+        angle_max_deg: 35.0,
+        angle_gain: 1.8,
+        // As it starts: it holds itself still (`tilt.hold`).
+        stability: Hold,
+    ),
+    start: (
+        air_height: 80.0,
+    ),
+    tilt: (
+        // The nacelles turn about a line through the pylons, 0.4 m above the centre of gravity:
+        // tilted forward their thrust passes only a little over it.
+        pivot: (0.0, 0.0, -0.4),
+        // The lever takes them from rotors up to 60° forward (it has no wing to fly on: the rotors
+        // carry it at any speed); the flight controller has 8° either side of that for itself,
+        // one nacelle against the other, for yaw and roll; the actuators turn them at 60°/s, and
+        // the conversion from one tilt to another goes at 10°/s (as the tilt-rotors that fly: 8°/s).
+        forward_deg: 60.0,
+        margin_deg: 8.0,
+        // The pitch stick tilts both nacelles up to 20° from where the lever has them, forward or
+        // back (to 15° behind upright): it goes forward and stops by its rings, level.
+        stick_tilt_deg: 20.0,
+        back_deg: 15.0,
+        rate_deg: 60.0,
+        conversion_rate_deg: 10.0,
+        split_authority_deg: 8.0,
+        // The rotors' cyclic moves each one's thrust up to 0.4 m off its hub (a fifth of its
+        // radius, as stiff rotors without hinges do): 19 kN m of pitch in the hover.
+        cyclic_arm: 0.4,
+        // With no help, full sticks ask for these accelerations (roll, pitch, yaw), rad/s².
+        direct: (1.5, 0.7, 0.6),
+        // Holding itself: the collective lever asks for a climb, 8 m/s at its top and 6 m/s down
+        // at its bottom, none in the tenth of its travel either side of the middle; with the
+        // nacelles' lever upright the stick asks for a speed over the ground, 15 m/s forward and
+        // 8 sideways at its ends, leaning up to 15° for it. It goes after a speed it has not with
+        // 1.2 m/s² (the climb) and 0.6 m/s² (over the ground) per m/s.
+        hold: (climb: (8.0, 6.0), dead_band: 0.1, speed: (15.0, 8.0), climb_gain: 1.2, speed_gain: 0.6, bank_deg: 15.0),
+        // From 15 m/s it begins to turn with its bank, as an aeroplane, and does so fully at 35.
+        turn_from: 15.0,
+        turn_full: 35.0,
+        surfaces: [
+            // The stub wings low on the cabin's sides, with the cabin between them: 4.4 m by 1.2.
+            (position: (0.2, 0.0, 1.3), area: 5.3, aspect: 3.6, incidence_deg: 2.0, stall_deg: 15.0, drag: 0.02),
+            // The tailplane across the fin, its elevator half its chord.
+            (position: (-4.9, 0.0, -0.4), area: 3.4, aspect: 3.4, incidence_deg: -2.0, stall_deg: 14.0, drag: 0.012, elevator: Some((effect: 0.6, travel_deg: 25.0))),
+            (position: (-4.9, 0.0, -0.7), area: 3.0, aspect: 1.5, upright: true, stall_deg: 16.0, drag: 0.012),
+        ],
+    ),
+)

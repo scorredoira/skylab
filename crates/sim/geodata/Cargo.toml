@@ -1,0 +1,24 @@
+[package]
+name = "geodata"
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+sim-core = { path = "../sim-core" }
+# The elevation tiles are PNGs (Terrarium); far lighter than `image`.
+png = "0.18.1"
+# Vector tiles may come gzipped (ureq already depends on it).
+flate2 = "1.1.11"
+
+# Native only: the web has no blocking network (see `fetch::http`).
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+# HTTPS for the map tiles and the aerodrome tables: blocking, with rustls, no async runtime.
+ureq = "3.5.1"
+
+# The web: synchronous requests from the workers it loads on, for the network and for the cache the
+# page's service worker keeps (`disk.rs`).
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "0.2.130"
+js-sys = "0.3.107"
+web-sys = { version = "0.3.107", features = ["Window", "XmlHttpRequest", "XmlHttpRequestResponseType"] }

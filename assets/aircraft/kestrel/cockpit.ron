@@ -1,0 +1,39 @@
+// The cockpit of cockpit.glb: what moves of it with the controls, where the eye can be, the
+// instruments and where they are painted. `crates/games/flight/src/cockpit/file.rs` says what
+// each field is. Body axes (x forward, y right, z down), metres, radians; the canvases in points.
+// The model is made in Blender by `scripts/blender/kestrel.py`.
+(
+    parts: [
+        (node: "cabin"),
+        // The stick leans with the roll and pitch sticks; the collective lever rises with the
+        // collective; the pedals slide with the yaw.
+        (node: "stick", moves: Stick(lean: 0.22)),
+        (node: "collective", moves: Turn(by: Throttle, angle: 0.45), axis: (0.0, 1.0, 0.0)),
+        (node: "pedals_left", moves: Slide(by: Rudder, along: (-0.05, 0.0, 0.0))),
+        (node: "pedals_right", moves: Slide(by: Rudder, along: (0.05, 0.0, 0.0))),
+    ],
+    glass: "glass",
+    spots: [
+        // The pilot's seat, on the right.
+        Seat(name: "pilot", eye: (2.62, 0.42, 0.66), fov: 72.0, shift: 0.2),
+        Seat(name: "pilot, leaning in", eye: (2.82, 0.42, 0.74), fov: 54.0, shift: 0.5),
+        LookingAt(name: "panel", eye: (2.6, 0.0, 0.95), at: (3.5, 0.0, 1.1), height: 0.95),
+        LookingAt(name: "flight display", eye: (3.0, 0.42, 1.0), at: (3.5, 0.42, 1.09), height: 0.38),
+    ],
+    sky_box: ((2.0, -1.0, -0.3), (5.06, 1.0, 2.1)),
+    // The three displays side by side in the canvas: flight, systems, situation.
+    canvas: (1360.0, 400.0),
+    instruments: [
+        (kind: FlightDisplay, at: (0.0, 0.0, 640.0, 400.0), clip: true),
+        (kind: SystemsDisplay, at: (640.0, 0.0, 320.0, 400.0), clip: true),
+        (kind: SituationDisplay, at: (960.0, 0.0, 400.0, 400.0), clip: true),
+    ],
+    // Nothing is printed in it yet.
+    print: (
+        size: (64.0, 64.0),
+        panel: (min: (-0.84, 0.88), size: (1.68, 0.54), top: 0.0, points: 64.0),
+        floor: (min: (0.0, 0.0), size: (1.0, 1.0), top: 32.0, points: 0.0),
+        panel_x: 3.4,
+        shapes: [],
+    ),
+)

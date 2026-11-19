@@ -1,0 +1,121 @@
+// A race round "Deepwood Forest" at sunset, three quads: the player's flown by the race's autopilot
+// (`racer`), against the course's network and another racer (`--ai`). Fifteen seconds, cut on the
+// action, with the lens, the slow motion and the sound of `crates/games/flight/src/record.rs`:
+//
+//   skylab --record <dir> --script scripts/video/deepwood.ron            (--storyboard: a still of each shot)
+//   scripts/video/assemble.sh <dir> deepwood.mp4 launch meadow lens hoop split fpv finish
+//   scripts/video/assemble.sh <dir> deepwood-square.mp4 --crop 1080:1080 launch meadow lens hoop split fpv finish
+//
+// The countdown is 3 s, so a shot's `before` is 3 s more than the race's clock at its first frame.
+// On that clock the player's quad is through the start's arch at 3.1 s, the meadow's gate at
+// 10.7 s, the wood's first hoop at 23.6 s, its hung hoop at 29.7 s, the high hoop of the clearing
+// at 42.4 s, the hung hoop of the run home at 56.3 s and the last hoop before the arch at 63.6 s
+// (`--storyboard` prints where the quad is at each still). Nothing is sped up; `speed` slows two
+// shots down. A quad is 25 cm across: a camera farther than a few metres from it shows a speck,
+// so every camera but the long lens flies with it.
+//
+// The hour is the sun's last quarter of an hour (18.45): its light is level and amber, the wood's
+// floor is in shade, and the gates' LEDs glow. The lens opens up for it (`exposure`), more under
+// the trees, where it also takes some contrast off for the floor to show.
+#![enable(implicit_some)]
+Script(
+    width: 1920,
+    height: 1080,
+    fps: 60,
+    supersample: 2,
+    subframes: 8,
+    shutter: 0.5,
+    sound: true,
+    lens: Lens(vignette: 0.28, flare: 0.9, bloom: 0.06, warmth: 0.15, exposure: 1.3),
+    shots: [
+        // The pads behind the arch: GO, and the three of them out through it. A chase drone
+        // just behind the player's.
+        Shot(
+            name: "launch",
+            args: "--course deepwood --ai --quality ultra --hour 18.45 --sky fair",
+            racer: true,
+            seconds: 2.5,
+            before: 3.5,
+            still: 1.2,
+            camera: [
+                Follow(t: 0.0, back: 2.8, up: 0.8, lag: 0.05, fov: 55),
+                Follow(t: 1.0, back: 1.6, up: 0.4, lag: 0.05, fov: 52),
+                Follow(t: 2.5, back: 0.6, up: 0.15, lag: 0.04, fov: 46),
+            ],
+        ),
+        // Across the meadow into the sun, low and close, through its gate.
+        Shot(
+            name: "meadow",
+            args: "--course deepwood --ai --quality ultra --hour 18.45 --sky fair",
+            racer: true,
+            seconds: 2.3,
+            before: 12.2,
+            still: 1.2,
+            camera: [Follow(t: 0.0, back: 0.5, up: 0.15, lag: 0.03, fov: 42)],
+        ),
+        // A long lens on the trail beyond the wood's first hoop: they come through it at the camera.
+        Shot(
+            name: "lens",
+            args: "--course deepwood --ai --quality ultra --hour 18.45 --sky fair",
+            racer: true,
+            seconds: 1.8,
+            before: 26.0,
+            still: 0.9,
+            lens: Lens(blur: 0.012, vignette: 0.28, flare: 0.9, bloom: 0.06, warmth: 0.15, exposure: 1.5, contrast: -0.25),
+            camera: [
+                At(t: 0.0, n: -1855.2, e: -5861.9, agl: 2.0, fov: 5),
+                At(t: 0.7, n: -1855.2, e: -5861.9, agl: 2.0, fov: 5),
+                At(t: 1.8, n: -1855.2, e: -5861.9, agl: 2.0, fov: 16),
+            ],
+        ),
+        // The hung hoop, slowed to a quarter as the quad goes through it.
+        Shot(
+            name: "hoop",
+            args: "--course deepwood --ai --quality ultra --hour 18.45 --sky fair",
+            racer: true,
+            seconds: 2.5,
+            before: 31.85,
+            still: 1.3,
+            speed: [(0.4, 1.0), (0.7, 0.25), (2.0, 0.25), (2.3, 1.0)],
+            lens: Lens(vignette: 0.28, flare: 0.9, bloom: 0.06, warmth: 0.15, exposure: 1.5, contrast: -0.25),
+            camera: [Follow(t: 0.0, back: 0.5, up: 0.15, lag: 0.03, fov: 42)],
+        ),
+        // Up through the high hoop of the clearing and into the split-S's turn, from beside it
+        // and a little under, against the sunset.
+        Shot(
+            name: "split",
+            args: "--course deepwood --ai --quality ultra --hour 18.45 --sky fair",
+            racer: true,
+            seconds: 2.0,
+            before: 44.6,
+            still: 0.8,
+            camera: [
+                Chase(t: 0.0, yaw: 115, pitch: -6, distance: 1.5, fov: 50),
+                Chase(t: 2.0, yaw: 90, pitch: -9, distance: 1.35, fov: 50),
+            ],
+        ),
+        // Through its own camera, as its pilot's goggles show it, down the run home.
+        Shot(
+            name: "fpv",
+            args: "--course deepwood --ai --quality ultra --hour 18.45 --sky fair",
+            racer: true,
+            osd: true,
+            seconds: 1.8,
+            before: 58.2,
+            still: 0.8,
+            lens: Lens(vignette: 0.2, flare: 0.9, bloom: 0.06, warmth: 0.15, exposure: 1.5),
+            camera: [Cockpit(t: 0.0, spot: 0)],
+        ),
+        // Home: the last hoop with the arch beyond it, slowing down into the last frame.
+        Shot(
+            name: "finish",
+            args: "--course deepwood --ai --quality ultra --hour 18.45 --sky fair",
+            racer: true,
+            seconds: 2.3,
+            before: 65.2,
+            still: 2.3,
+            speed: [(0.9, 1.0), (1.3, 0.25)],
+            camera: [Follow(t: 0.0, back: 0.5, up: 0.15, lag: 0.03, fov: 42)],
+        ),
+    ],
+)

@@ -1,0 +1,42 @@
+// What moves of exterior.glb and how, its lights, its shadow: `crates/games/flight/src/models.rs`
+// says what each field is. Body axes (x forward, y right, z down), metres, radians.
+(
+    parts: [
+        (node: "fuselage", inside: Hidden),
+        (node: "cowling", shades_cabin: true),
+        (node: "airframe", shades_cabin: true),
+        (node: "flap_left", moves: Surface(by: FlapLeft, scale: 1.0), axis: (0.0, 0.9995426, 0.030241946)),
+        (node: "flap_right", moves: Surface(by: FlapRight, scale: 1.0), axis: (0.0, 0.9995426, -0.030241946)),
+        (node: "aileron_left", moves: Surface(by: AileronLeft, scale: 1.0), axis: (0.0, 0.9995426, 0.030241946)),
+        (node: "aileron_right", moves: Surface(by: AileronRight, scale: -1.0), axis: (0.0, 0.9995426, -0.030241946)),
+        (node: "elevator", moves: Surface(by: Elevator, scale: 1.0), axis: (0.0, 1.0, 0.0)),
+        (node: "rudder", moves: Surface(by: Rudder, scale: -1.0), axis: (0.0, 0.0, 1.0)),
+        (node: "strut_nose", moves: Strut(leg: 0)),
+        (node: "fork_nose", moves: Fork(leg: 0), axis: (0.12984397, 0.0, 0.9915344)),
+        (node: "wheel_nose", moves: Wheel(leg: 0)),
+        (node: "strut_left", moves: Strut(leg: 1), axis: (0.066, -0.713, 0.392)),
+        (node: "fork_left", moves: Fork(leg: 1), axis: (0.0, 0.0, 1.0)),
+        (node: "wheel_left", moves: Wheel(leg: 1)),
+        (node: "strut_right", moves: Strut(leg: 2), axis: (0.066, 0.713, 0.392)),
+        (node: "fork_right", moves: Fork(leg: 2), axis: (0.0, 0.0, 1.0)),
+        (node: "wheel_right", moves: Wheel(leg: 2)),
+        (node: "propeller", moves: Propeller, axis: (1.0, 0.0, 0.0)),
+        (node: "propeller_disc", moves: Disc, inside: Hidden),
+    ],
+    lights: [
+        (node: "light_left", kind: Navigation, color: (3.2, 0.06, 0.04)),
+        (node: "light_right", kind: Navigation, color: (0.05, 2.8, 0.7)),
+        (node: "beacon", kind: Beacon, color: (4.5, 0.08, 0.05)),
+        (node: "light_tail", kind: Navigation, color: (3.5, 3.5, 3.2)),
+        (node: "landing_light", kind: Landing, color: (9.0, 9.0, 8.0)),
+    ],
+    shadow: (
+        flat: ((-0.05, 0.75, 0.0, 5.45), (0.15, 1.75, 0.0, 0.55), (-3.3, 1.7, 0.0, 0.3), (-5.0, 0.7, 0.0, 1.7)),
+        flat_z: (-0.85, 0.0, -0.3, -0.25),
+        upright: ((0.15, 1.75, -0.3, 0.95), (-3.3, 1.7, -0.35, 0.55), (-5.1, 0.7, -1.15, 0.85)),
+    ),
+    parked: Some((
+        lift: 1.17,
+        hull: [((0.0, 1.9, 0.0), (0.75, 5.45), 0.15), ((-1.7, 0.9, 0.0), (3.5, 0.5), 1.0), ((-4.9, 1.35, 0.0), (0.5, 1.7), 0.08)],
+    )),
+)
