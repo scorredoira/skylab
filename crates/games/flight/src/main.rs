@@ -228,11 +228,11 @@ enum Shown {
 
 #[cfg(not(target_arch = "wasm32"))]
 impl Shown {
-    /// The game a hand-over names, made: the driving game, or this one with the arguments given
+    /// The game a hand-over names, made: the driving game (with `--car`, the car chosen), or this one with the arguments given
     /// (`--menu vehicles`: its first screen), at the hour of the computer's clock.
     fn make(name: &str, arguments: Vec<String>, gpu: &engine::Gpu) -> Shown {
         if name == ui::menu::vehicles::DRIVE {
-            return Shown::Drive(Box::new(drive::start(gpu)));
+            return Shown::Drive(Box::new(drive::start(gpu, &arguments)));
         }
         let options = parse(arguments.into_iter(), true).map(|c| c.options).unwrap_or_default();
         let options = Options { clock: engine::clock::local_hour(), ..options };

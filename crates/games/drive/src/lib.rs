@@ -18,9 +18,12 @@ pub mod replay;
 pub mod rivals;
 pub mod timing;
 
-/// The game as it starts with nothing on the command line: what another program shows in its
-/// window in place of its own game.
-pub fn start(gpu: &engine::Gpu) -> game::Drive {
-    let options = game::Options::default();
+/// The game as another program shows it in its window in place of its own: as with nothing on the
+/// command line but `--car <name>`, if `arguments` have it.
+pub fn start(gpu: &engine::Gpu, arguments: &[String]) -> game::Drive {
+    let mut options = game::Options::default();
+    if let Some(car) = arguments.iter().position(|a| a == "--car").and_then(|i| arguments.get(i + 1)) {
+        options.car = car.clone();
+    }
     game::Drive::new(gpu, &options, audio::Audio::start(&options.car))
 }

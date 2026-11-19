@@ -3,7 +3,9 @@
 //! (the aircraft to choose from are then those of the family, `hangar`), and the cars, which are
 //! the driving game's, which this program has inside it and shows in its window in this game's
 //! place (`engine::program::hand_over`, `Shown` in `main.rs`). On the web there are no cars. A click on a picture chooses it; the arrows and
-//! Enter, or a pad, do the same. The start and pause screen opens it again ("Change vehicle").
+//! Enter, or a pad, do the same. The cars' card has a button for each car, each a stop of the
+//! cursor; a click elsewhere on it drives the first. The start and pause screen opens it again
+//! ("Change vehicle").
 
 use super::theme::{self, icon};
 use super::{no_picture, Cursor, Nav, Pictures};
@@ -18,8 +20,8 @@ pub const DRIVE: &str = "skylab-drive";
 pub enum Choice {
     /// A family of this game's: its aircraft are shown next.
     Fly(Family),
-    /// The driving game.
-    Cars,
+    /// The driving game, with this car.
+    Car(sim_core::CarKind),
     /// Back to the start and pause screen, with the craft flown.
     Close,
 }
@@ -36,6 +38,8 @@ struct Card {
     line: &'static str,
     /// What choosing it does, in a word.
     action: &'static str,
+    /// The cars' card: a button for each, in place of the one of `action`.
+    cars: Vec<sim_core::CarKind>,
 }
 
 #[derive(Default)]
@@ -63,6 +67,7 @@ fn cards(cars: bool) -> Vec<Card> {
             fleet: names(Family::Planes.crafts().map(|c| c.name())),
             line: "Light aircraft with working cockpits, from any airfield in the world.",
             action: "Fly",
+            cars: Vec::new(),
         },
         Card {
             choice: Choice::Fly(Family::Drones),
@@ -72,17 +77,20 @@ fn cards(cars: bool) -> Vec<Card> {
             fleet: names(Family::Drones.crafts().map(|c| c.name())),
             line: "Quads to fly anywhere, or to race through the gates of a course.",
             action: "Fly",
+            cars: Vec::new(),
         },
     ];
     if cars {
+        let all: Vec<sim_core::CarKind> = sim_core::CarKind::all().collect();
         cards.push(Card {
-            choice: Choice::Cars,
+            choice: Choice::Car(all.first().copied().unwrap_or(sim_core::CarKind::GT)),
             picture: "cars",
             glyph: icon::CAR,
             name: "Cars",
             fleet: names(sim_core::CarKind::all().map(|c| c.name()).chain(sim_core::circuit::file::circuits().iter().map(|c| c.name.as_str()))),
             line: "A circuit to learn and laps to beat, alone or against rivals.",
             action: "Drive",
+            cars: all,
         });
     }
     cards
@@ -174,22 +182,66 @@ impl Vehicles {
                 if !across {
                     self.cursor.row();
                 }
-                let focus = self.cursor.item(false);
+                let error = if matches!(card.choice, Choice::Car(_)) { self.error.as_deref() } else { None };
+                let buttons = if error.is_none() { pills(&painter, rect, card) } else { Vec::new() };
+                // A card of one button is a stop of the cursor; the cars' card, each of its buttons.
+                let focus = (buttons.len() <= 1).then(|| self.cursor.item(false));
                 let response = ui.interact(rect, ui.scope_id().with(card.picture), Sense::click());
-                let lit = ui.ctx().animate_bool_with_time(response.id, response.hovered() || focus.on, 0.18);
-                let error = if card.choice == Choice::Cars { self.error.as_deref() } else { None };
-                draw(&painter, rect, card, lit, rows, error, pictures.vehicle(ui.ctx(), card.picture));
-                focus.show(ui, rect, 18.0);
-                if response.hovered() {
+                let mut lit_pills = Vec::new();
+                let mut any_on = false;
+                for (k, (pill, _)) in buttons.iter().enumerate() {
+                    if buttons.len() <= 1 {
+                        lit_pills.push(None);
+                        continue;
+                    }
+                    let focus = self.cursor.item(false);
+                    let pill_response = ui.interact(*pill, ui.scope_id().with((card.picture, k)), Sense::click());
+                    lit_pills.push(Some(ui.ctx().animate_bool_with_time(pill_response.id, pill_response.hovered() || focus.on, 0.18)));
+                    any_on |= focus.on || pill_response.hovered();
+                    focus.show(ui, *pill, pill.height() / 2.0);
+                    if pill_response.clicked() || focus.activate {
+                        choice = Some(Choice::Car(card.cars[k]));
+                    }
+                }
+                let lit = ui.ctx().animate_bool_with_time(response.id, response.hovered() || any_on || focus.as_ref().is_some_and(|f| f.on), 0.18);
+                draw(&painter, rect, card, lit, rows, error, &buttons, &lit_pills, pictures.vehicle(ui.ctx(), card.picture));
+                if let Some(focus) = &focus {
+                    focus.show(ui, rect, 18.0);
+                }
+                if response.hovered() || any_on {
                     ui.ctx().set_cursor_icon(egui::CursorIcon::PointingHand);
                 }
-                if response.clicked() || focus.activate {
+                if choice.is_none() && (response.clicked() || focus.is_some_and(|f| f.activate)) {
                     choice = Some(card.choice);
                 }
             }
         });
         choice
     }
+}
+
+/// A card's buttons at its foot and what each says: the one of its `action`, or the cars' card a
+/// car each, side by side and, if they do not fit across, the next row above. None in a card too low.
+fn pills(painter: &egui::Painter, rect: Rect, card: &Card) -> Vec<(Rect, String)> {
+    if rect.height() < 250.0 {
+        return Vec::new();
+    }
+    let Type { s, pad, width, .. } = Type::of(rect);
+    let labels: Vec<String> = if card.cars.is_empty() { vec![card.action.to_string()] } else { card.cars.iter().map(|c| c.name().to_string()).collect() };
+    let (left, gap, height) = (rect.left() + pad, 10.0 * s, 40.0 * s);
+    let (mut x, mut bottom) = (left, rect.bottom() - pad);
+    labels
+        .into_iter()
+        .map(|label| {
+            let w = painter.layout_no_wrap(label.clone(), theme::bold(16.0 * s.max(0.85)), Color32::WHITE).size().x + 62.0 * s;
+            if x > left && x + w > left + width {
+                (x, bottom) = (left, bottom - height - gap);
+            }
+            let pill = Rect::from_min_max(pos2(x, bottom - height), pos2(x + w, bottom));
+            x += w + gap;
+            (pill, label)
+        })
+        .collect()
 }
 
 /// How a card of this size is written on: the size of its text against the full one, whether it
@@ -257,7 +309,9 @@ fn shade(painter: &egui::Painter, rect: Rect, radius: f32, wide: bool, strength:
 /// (0 to 1) is how far the pointer or the cursor has lit it up: the picture comes a little nearer
 /// and brighter, and what choosing it does shows in the accent. `rows` is the room left for the
 /// line about it, the same in every card so that their names stand level.
-fn draw(painter: &egui::Painter, rect: Rect, card: &Card, lit: f32, rows: usize, error: Option<&str>, picture: Option<egui::TextureHandle>) {
+/// `pills` are its buttons (`pills`) and how lit each is of its own (`None`: as the card).
+#[allow(clippy::too_many_arguments)]
+fn draw(painter: &egui::Painter, rect: Rect, card: &Card, lit: f32, rows: usize, error: Option<&str>, pills: &[(Rect, String)], pills_lit: &[Option<f32>], picture: Option<egui::TextureHandle>) {
     let radius = 18.0;
     let Type { s, wide, pad, width, font, row } = Type::of(rect);
     match &picture {
@@ -285,13 +339,15 @@ fn draw(painter: &egui::Painter, rect: Rect, card: &Card, lit: f32, rows: usize,
         let lines = measure.rows.len().min(3) as f32;
         theme::paragraph(painter, pos2(left, y - lines * 16.0), width, 3, error, theme::regular(12.5), theme::BAD);
         y -= lines * 16.0 + 10.0;
-    } else if rect.height() >= 250.0 {
-        let go = painter.layout_no_wrap(card.action.to_string(), theme::bold(16.0 * s.max(0.85)), Color32::WHITE);
-        let pill = Rect::from_min_max(pos2(left, y - 40.0 * s), pos2(left + go.size().x + 62.0 * s, y));
-        painter.rect(pill, pill.height() / 2.0, theme::mix(Color32::from_white_alpha(26), theme::ACCENT_FILL, lit), Stroke::new(1.0, Color32::from_white_alpha((70.0 * (1.0 - lit)) as u8)), StrokeKind::Inside);
-        painter.galley(pos2(pill.left() + 18.0 * s, pill.center().y - go.size().y / 2.0), go, Color32::WHITE);
-        theme::icon(painter, pos2(pill.right() - 20.0 * s + 3.0 * lit, pill.center().y), icon::ARROW_RIGHT, 17.0 * s, Color32::WHITE);
-        y = pill.top() - 16.0 * s;
+    } else if !pills.is_empty() {
+        for (k, (pill, label)) in pills.iter().enumerate() {
+            let lit = pills_lit.get(k).copied().flatten().unwrap_or(lit);
+            let go = painter.layout_no_wrap(label.clone(), theme::bold(16.0 * s.max(0.85)), Color32::WHITE);
+            painter.rect(*pill, pill.height() / 2.0, theme::mix(Color32::from_white_alpha(26), theme::ACCENT_FILL, lit), Stroke::new(1.0, Color32::from_white_alpha((70.0 * (1.0 - lit)) as u8)), StrokeKind::Inside);
+            painter.galley(pos2(pill.left() + 18.0 * s, pill.center().y - go.size().y / 2.0), go, Color32::WHITE);
+            theme::icon(painter, pos2(pill.right() - 20.0 * s + 3.0 * lit, pill.center().y), icon::ARROW_RIGHT, 17.0 * s, Color32::WHITE);
+        }
+        y = pills.iter().map(|(p, _)| p.top()).fold(y, f32::min) - 16.0 * s;
     }
     y -= rows as f32 * row;
     theme::paragraph(painter, pos2(left, y), width, 2, card.line, font, Color32::from_gray(228));
@@ -319,7 +375,8 @@ mod tests {
     #[test]
     fn the_cards_are_the_planes_the_drones_and_the_cars_each_with_its_picture() {
         let all = cards(true);
-        assert_eq!(all.iter().map(|c| c.choice).collect::<Vec<_>>(), [Choice::Fly(Family::Planes), Choice::Fly(Family::Drones), Choice::Cars]);
+        assert_eq!(all.iter().map(|c| c.choice).collect::<Vec<_>>(), [Choice::Fly(Family::Planes), Choice::Fly(Family::Drones), Choice::Car(sim_core::CarKind::GT)]);
+        assert_eq!(all[2].cars, [sim_core::CarKind::GT, sim_core::CarKind::MODEL_Y]);
         assert_eq!(all[0].fleet, "Cessna 172 · Extra 300L · Kestrel tilt-rotor");
         assert!(all[2].fleet.contains("Lakeside Park"), "{}", all[2].fleet);
         for card in &all {

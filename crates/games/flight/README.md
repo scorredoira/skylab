@@ -627,7 +627,8 @@ taken in the game, with a name, what there is of it and a line: **Planes**, **Dr
   family before any was) and shows its aircraft to choose from, over the start and pause screen
   (`Session::choose_family`). From then on the aircraft shown are those of the family flown.
 - The cars are the driving game (`crates/games/drive`), which this program has inside it: "Cars"
-  shows it in this window in place of this game (`engine::program::hand_over`, made by `Shown` in
+  shows it in this window in place of this game, with the car of the button chosen (a button a car
+  on the card, `--car`) (`engine::program::hand_over`, made by `Shown` in
   `main.rs`: the flight game is dropped, its sound with it), and its pause menu's "Change vehicle"
   brings this game back, made again with `--menu vehicles`, on the first screen. The web has no
   driving game: there the screen shows the planes and the drones.
